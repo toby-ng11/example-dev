@@ -14,6 +14,7 @@ type RegisterForm = {
     email: string;
     password: string;
     password_confirmation: string;
+    username: string;
 };
 
 export default function Register() {
@@ -22,6 +23,7 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
+        username: '',
     });
 
     const submit: FormEventHandler = (e) => {
@@ -62,7 +64,10 @@ export default function Register() {
                             tabIndex={2}
                             autoComplete="email"
                             value={data.email}
-                            onChange={(e) => setData('email', e.target.value)}
+                            onChange={(e) => {
+                                setData('email', e.target.value);
+                                setData('username', e.target.value);
+                            }}
                             disabled={processing}
                             placeholder="email@example.com"
                         />
