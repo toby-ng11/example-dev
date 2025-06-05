@@ -7,6 +7,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(({ command }) => {
     const isDev = command === 'serve';
+    const isExposed = process.argv.includes('--host');
 
     return {
         plugins: [
@@ -27,17 +28,20 @@ export default defineConfig(({ command }) => {
             },
         },
         server: isDev
-            ? {
-                  https: {
-                      key: fs.readFileSync(resolve(__dirname, 'certs/p2q.key')),
-                      cert: fs.readFileSync(resolve(__dirname, 'certs/p2q.crt')),
-                  },
-                  host: '0.0.0.0',
-                  hmr: {
-                      protocol: 'wss',
-                      host: 'p2q.centura.local',
-                  },
-              }
+            ? isExposed
+                ? {
+                      host: '0.0.0.0',
+                      port: 5173,
+                      https: {
+                          key: fs.readFileSync(resolve(__dirname, 'certs/p2q.key')),
+                          cert: fs.readFileSync(resolve(__dirname, 'certs/p2q.crt')),
+                      },
+                      hmr: {
+                          protocol: 'wss',
+                          host: 'p2q.centura.local',
+                      },
+                  }
+                : undefined
             : undefined,
     };
 });
