@@ -46,8 +46,8 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
 
-      - name: Gitleaks
-        uses: gitleaks/gitleaks-action@v2.3.9
-
       - name: Tests
         run: ./vendor/bin/pest
+
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2.3.9
