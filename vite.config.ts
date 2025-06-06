@@ -7,7 +7,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(({ command }) => {
     const isDev = command === 'serve';
-    const isExposed = process.argv.includes('--host');
+    const isExposed = process.argv.includes('--host'); // use npm run dev:work for work
 
     return {
         plugins: [
