@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Location;
+use App\Models\MarketSegment;
+use App\Models\Status;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,12 +23,12 @@ class ProjectFactory extends Factory
             'project_id_ext' => $this->faker->uuid(),
             'project_name' => $this->faker->company(),
             'project_address' => $this->faker->address(),
-            'centura_location_id' => $this->faker->uuid(),
-            'owner_id' => $this->faker->uuid(),
-            'shared_id' => $this->faker->uuid(),
-            'status_id' => $this->faker->numberBetween(0, 5),
+            'centura_location_id' => Location::inRandomOrder()->whereBetween('location_id', [101, 113])->value('location_id') ?? 101,
+            'owner_id' => fake()->unique()->userName(),
+            'shared_id' => fake()->unique()->userName(),
+            'status_id' => Status::inRandomOrder()->value('status_id'),
             'reed' => $this->faker->word(),
-            'market_segment_id' => $this->faker->randomDigitNotNull(),
+            'market_segment_id' => MarketSegment::inRandomOrder()->value('market_segment_id'),
             'specifier_id' => $this->faker->randomDigitNotNull(),
             'general_contractor_id' => $this->faker->numberBetween(100000, 999999),
             'awarded_contractor_id' => $this->faker->numberBetween(100000, 999999),
