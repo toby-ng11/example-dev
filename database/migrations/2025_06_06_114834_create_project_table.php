@@ -27,11 +27,11 @@ return new class extends Migration
             $table->decimal('awarded_contractor_id', 19, 0)->nullable();
             $table->dateTime('require_date')->nullable();
             $table->dateTime('due_date')->nullable();
-            $table->dateTime('create_date')->nullable();
             $table->string('last_maintained_by', 50)->nullable();
             $table->char('delete_flag', 1)->nullable();
             $table->integer('architect_id')->nullable();
             $table->integer('architect_address_id')->nullable();
+            $table->timestamps();
             $table->softDeletes();
         });
     }

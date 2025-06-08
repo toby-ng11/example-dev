@@ -52,11 +52,6 @@ class User extends Authenticatable implements LdapAuthenticatable
         ];
     }
 
-    /**
-     * A user can have many projects.
-     *
-     * @return HasMany
-     */
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class, 'owner_id', 'username');
