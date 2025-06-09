@@ -34,7 +34,6 @@ class ProjectFactory extends Factory
             'awarded_contractor_id' => $this->faker->numberBetween(100000, 999999),
             'require_date' => $this->faker->dateTimeThisYear(),
             'due_date' => $this->faker->dateTimeThisYear(),
-            'create_date' => $this->faker->dateTimeThisYear(),
             'last_maintained_by' => $this->faker->name(),
             'delete_flag' => $this->faker->randomElement(['Y', 'N']),
             'architect_id' => $this->faker->randomDigitNotNull(),

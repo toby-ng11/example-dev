@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Location extends Model
+class P21LocationxBranch extends Model
 {
     protected $table = 'P21_Location_x_Branch';
 
@@ -21,6 +21,6 @@ class Location extends Model
 
     public function projects(): HasMany
     {
-        return $this->hasMany(Project::class, 'cetura_location_id', 'location_id');
+        return $this->hasMany(Project::class, 'centura_location_id', 'location_id');
     }
 }

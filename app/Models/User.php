@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -55,5 +56,10 @@ class User extends Authenticatable implements LdapAuthenticatable
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class, 'owner_id', 'username');
+    }
+
+    public function p21User(): HasOne
+    {
+        return $this->hasOne(P21User::class, 'id', 'username');
     }
 }

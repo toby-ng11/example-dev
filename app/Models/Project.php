@@ -5,13 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
 {
     use HasFactory, SoftDeletes;
-
-    const CREATED_AT = 'create_date';
 
     protected $table = 'project';
 
@@ -33,7 +32,6 @@ class Project extends Model
         'awarded_contractor_id',
         'require_date',
         'due_date',
-        'create_date',
         'last_maintained_by',
         'architect_id',
         'architect_address_id',
@@ -51,6 +49,21 @@ class Project extends Model
 
     public function location(): BelongsTo
     {
-        return $this->belongsTo(Location::class, 'centura_location_id', 'location_id');
+        return $this->belongsTo(P21LocationxBranch::class, 'centura_location_id', 'location_id');
+    }
+
+    public function architect(): BelongsTo
+    {
+        return $this->belongsTo(Architect::class, 'architect_id', 'architect_id');
+    }
+
+    public function notes(): HasMany
+    {
+        return $this->hasMany(ProjectNote::class, 'project_id', 'project_id');
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(ProjectItem::class, 'project_id', 'project_id');
     }
 }
