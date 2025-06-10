@@ -3,32 +3,40 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, BookUser, Folder, Home, LayoutGrid } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { BookOpen, BookUser, Folder, Home, LayoutGrid, ShieldCheck } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Project Dashboard',
-        href: '/projects',
-        icon: Home,
-    },
-    {
-        title: 'Architect Dashboard',
-        href: '/architects',
-        icon: BookUser,
-    },
-    {
-        title: 'Quote Dashboard',
-        href: '/quotes',
-        icon: LayoutGrid,
-    },
-];
+function getMainNavItems(userRole: string | null): NavItem[] {
+    const base: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+            icon: LayoutGrid,
+        },
+        {
+            title: 'Project Dashboard',
+            href: '/projects',
+            icon: Home,
+        },
+        {
+            title: 'Architect Dashboard',
+            href: '/architects',
+            icon: BookUser,
+        },
+        {
+            title: 'Quote Dashboard',
+            href: '/quotes',
+            icon: LayoutGrid,
+        },
+    ];
+
+    if (userRole === 'admin') {
+        base.unshift({ title: 'Admin Dashboard', href: '/admin', icon: ShieldCheck });
+    }
+
+    return [...base]; // ensure return is always a fresh array
+}
 
 const footerNavItems: NavItem[] = [
     {
@@ -44,6 +52,12 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { props } = usePage();
+
+    const userRole = props.userRole as string | null;
+
+    const mainNavItems = getMainNavItems(userRole);
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
