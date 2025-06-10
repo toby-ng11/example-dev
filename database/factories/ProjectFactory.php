@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Location;
 use App\Models\MarketSegment;
+use App\Models\P21LocationxBranch;
 use App\Models\Status;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,7 +23,7 @@ class ProjectFactory extends Factory
             'project_id_ext' => $this->faker->uuid(),
             'project_name' => $this->faker->company(),
             'project_address' => $this->faker->address(),
-            'centura_location_id' => Location::inRandomOrder()->whereBetween('location_id', [101, 113])->value('location_id') ?? 101,
+            'centura_location_id' => P21LocationxBranch::inRandomOrder()->whereBetween('location_id', [101, 113])->value('location_id') ?? 101,
             'owner_id' => fake()->unique()->userName(),
             'shared_id' => fake()->unique()->userName(),
             'status_id' => Status::inRandomOrder()->value('status_id'),
