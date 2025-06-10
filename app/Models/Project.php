@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Views\P21LocationxBranch;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
     protected $table = 'project';
 
@@ -59,11 +60,16 @@ class Project extends Model
 
     public function notes(): HasMany
     {
-        return $this->hasMany(ProjectNote::class, 'project_id', 'project_id');
+        return $this->hasMany(ProjectNote::class, 'project_id');
     }
 
     public function items(): HasMany
     {
-        return $this->hasMany(ProjectItem::class, 'project_id', 'project_id');
+        return $this->hasMany(ProjectItem::class, 'project_id');
+    }
+
+    public function quotes(): HasMany
+    {
+        return $this->hasMany(Quote::class, 'project_id');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Views\P21LocationxBranch;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Architect extends Model
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
     protected $table = 'architect';
 
@@ -42,5 +43,10 @@ class Architect extends Model
     public function location(): BelongsTo
     {
         return $this->belongsTo(P21LocationxBranch::class, 'company_id', 'company_id');
+    }
+
+    public function type(): BelongsTo
+    {
+        return $this->belongsTo(ArchitectType::class, 'architect_type_id', 'architect_type_id');
     }
 }

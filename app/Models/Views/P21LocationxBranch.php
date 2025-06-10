@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Views;
 
+use App\Models\Project;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 

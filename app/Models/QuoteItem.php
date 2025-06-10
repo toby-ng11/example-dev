@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ProjectItem extends Model
+class QuoteItem extends Model
 {
     use SoftDeletes;
 
@@ -15,7 +15,7 @@ class ProjectItem extends Model
 
     protected $fillable = [
         'item_id',
-        'project_id',
+        'quote_id',
         'quantity',
         'unit_price',
         'uom',
@@ -25,8 +25,8 @@ class ProjectItem extends Model
         'last_maintained_by',
     ];
 
-    public function project(): BelongsTo
+    public function quote(): BelongsTo
     {
-        return $this->belongsTo(Project::class, 'project_id', 'project_id');
+        return $this->belongsTo(Quote::class, 'quote_id', 'quote_id');
     }
 }

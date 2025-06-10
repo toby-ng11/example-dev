@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Specifier extends Model
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
     protected $table = 'specifier';
 
@@ -24,7 +24,7 @@ class Specifier extends Model
         'address_id',
     ];
 
-    public function addresses(): HasOne
+    public function address(): HasOne
     {
         return $this->hasOne(Address::class, 'address_id', 'address_id');
     }
