@@ -41,3 +41,20 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+declare global {
+    namespace App {
+        interface PageProps {
+            [key: string]: unknown;
+            auth: {
+                user: User | null;
+            };
+            flash?: {
+                message?: string;
+                error?: string;
+                success?: string;
+            };
+            errors?: Record<string, string>;
+        }
+    }
+}

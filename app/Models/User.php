@@ -15,10 +15,12 @@ use LdapRecord\Laravel\Auth\HasLdapUser;
 use LdapRecord\Laravel\Auth\LdapAuthenticatable;
 use LdapRecord\Laravel\Auth\AuthenticatesWithLdap;
 
+use Laravel\Sanctum\HasApiTokens;
+
 class User extends Authenticatable implements LdapAuthenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, AuthenticatesWithLdap, HasLdapUser;
+    use HasApiTokens, HasFactory, Notifiable, AuthenticatesWithLdap, HasLdapUser;
 
     /**
      * The attributes that are mass assignable.
