@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('centura_location_id', 50)->nullable();
             $table->string('owner_id', 50)->nullable();
             $table->string('shared_id', 50)->nullable();
-            $table->integer('status')->nullable();
+            $table->integer('status_id')->nullable();
             $table->string('reed', 50)->nullable();
             $table->integer('market_segment_id')->nullable();
             $table->integer('specifier_id')->nullable();

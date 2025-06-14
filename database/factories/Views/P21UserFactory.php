@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Factories;
+namespace Database\Factories\Views;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -36,7 +36,7 @@ class P21UserFactory extends Factory
             'default_location_id' => 101,
             'default_branch' => $branch,
             'role_uid' => $this->faker->randomNumber(3, true),
-            'email_address' => strtolower("substr($firstName, 0, 1) . $lastName@example.com"),
+            'email_address' => strtoupper(substr($firstName, 0, 1) . $lastName) . "@example.com",
             'delete_flag' => 'N',
             'role' => "$defaultCompany - $roleName",
             'branch_description' => 'Main Branch',
