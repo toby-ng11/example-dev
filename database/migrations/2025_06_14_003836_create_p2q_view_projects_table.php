@@ -12,11 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("
-        CREATE_VIEW p2q_view_projects
-        AS
-        SELECT **view_query**
-        ");
+        //TODO: Put view query here
+       // DB::statement("
+        //");
     }
 
     /**
