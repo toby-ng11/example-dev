@@ -1,5 +1,7 @@
+import { DataTableViewOptions } from '@/components/table-column-toggle';
+import { DataTableColumnHeader } from '@/components/table-header';
+import { DataTablePagination } from '@/components/table-pagination';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
@@ -16,7 +18,7 @@ import {
 } from '@tanstack/react-table';
 import axios from 'axios';
 import dayjs from 'dayjs';
-import { ArrowDown, ArrowUp, ArrowUpDown, Ellipsis, LucideSettings2, PlusCircle } from 'lucide-react';
+import { Ellipsis, PlusCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface Project {
@@ -60,21 +62,7 @@ export default function ProjectTable() {
     const columns: ColumnDef<Project>[] = [
         {
             accessorKey: 'project_id',
-            header: ({ column }) => {
-                const isSorted = column.getIsSorted();
-                return (
-                    <Button variant="ghost" onClick={() => column.toggleSorting(isSorted === 'asc')}>
-                        ID
-                        {isSorted === 'asc' ? (
-                            <ArrowUp className="ml-2 h-4 w-4" />
-                        ) : isSorted === 'desc' ? (
-                            <ArrowDown className="ml-2 h-4 w-4" />
-                        ) : (
-                            <ArrowUpDown className="ml-2 h-4 w-4" />
-                        )}
-                    </Button>
-                );
-            },
+            header: ({ column }) => <DataTableColumnHeader column={column} title="ID" className="justify-center" />,
             cell: ({ row }) => <div className="text-center">{row.getValue('project_id')}</div>,
             enableHiding: false,
         },
@@ -83,43 +71,45 @@ export default function ProjectTable() {
             accessorKey: 'project_id_ext',
         },
         {
-            header: 'Name',
             accessorKey: 'project_name',
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
             cell: ({ row }) => <div className="max-w-[400px] truncate font-medium">{row.getValue('project_name')}</div>,
         },
         {
-            header: 'Owner',
             accessorKey: 'owner_id',
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Owner" />,
         },
         {
-            header: 'Shared',
             accessorKey: 'shared_id',
+            id: 'Shared',
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Shared" />,
         },
         {
-            header: 'Create Date',
             accessorKey: 'created_at',
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
             cell: ({ row }) => dayjs(row.getValue('created_at')).format('MMM D, YYYY'),
         },
         {
-            header: 'Due Date',
             accessorKey: 'due_date',
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Due Date" />,
             cell: ({ row }) => dayjs(row.getValue('due_date')).format('MMM D, YYYY'),
         },
         {
-            header: 'Architect',
             accessorKey: 'architect_name',
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Architect" />,
             cell: ({ row }) => <div className="max-w-[300px] truncate font-medium">{row.getValue('architect_name')}</div>,
         },
         {
-            header: 'Market Segment',
             accessorKey: 'market_segment_desc',
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Market Segment" />,
         },
         {
-            header: 'Status',
             accessorKey: 'status_desc',
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
         },
         {
-            header: 'Options',
+            accessorKey: 'options',
+            header: () => null,
             cell: () => (
                 <Button variant="ghost">
                     <Ellipsis className="h-4 w-4" />
@@ -179,30 +169,7 @@ export default function ProjectTable() {
                             </Button>
                         </div>
                         <div className="flex items-center gap-4">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="sm">
-                                        <LucideSettings2 /> Customize Columns
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    {table
-                                        .getAllColumns()
-                                        .filter((column) => column.getCanHide())
-                                        .map((column) => {
-                                            return (
-                                                <DropdownMenuCheckboxItem
-                                                    key={column.id}
-                                                    className="capitalize"
-                                                    checked={column.getIsVisible()}
-                                                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                                                >
-                                                    {column.columnDef.header as string}
-                                                </DropdownMenuCheckboxItem>
-                                            );
-                                        })}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <DataTableViewOptions table={table} />
                             <Button size="sm">Add Project</Button>
                         </div>
                     </div>
@@ -233,17 +200,8 @@ export default function ProjectTable() {
                         </Table>
                     </div>
                 </div>
-                <div className="flex items-center justify-end space-x-2 py-4">
-                    <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-                        Previous
-                    </Button>
-                    <div className="text-muted-foreground text-sm">
-                        Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-                    </div>
-                    <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-                        Next
-                    </Button>
-                </div>
+
+                <DataTablePagination table={table} />
             </div>
         </div>
     );
