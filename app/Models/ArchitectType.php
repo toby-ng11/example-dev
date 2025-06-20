@@ -15,6 +15,6 @@ class ArchitectType extends Model
 
     public function architects(): HasMany
     {
-        return $this->hasMany(Architect::class, 'architect_type_id');
+        return $this->hasMany(Architect::class);
     }
 }

@@ -33,11 +33,11 @@ class Address extends Model
 
     public function architect(): BelongsTo
     {
-        return $this->belongsTo(Architect::class, 'architect_id', 'architect_id');
+        return $this->belongsTo(Architect::class);
     }
 
     public function specifier(): BelongsTo
     {
-        return $this->belongsTo(Specifier::class, 'specifier_id', 'specifier_id');
+        return $this->belongsTo(Specifier::class);
     }
 }

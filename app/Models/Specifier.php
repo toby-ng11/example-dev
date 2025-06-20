@@ -27,6 +27,6 @@ class Specifier extends Model
 
     public function architect(): BelongsTo
     {
-        return $this->belongsTo(Architect::class, 'architect_id', 'architect_id');
+        return $this->belongsTo(Architect::class);
     }
 }

@@ -13,10 +13,6 @@ class Project extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'project';
-
-    protected $primaryKey = 'project_id';
-
     protected $fillable = [
         'project_id_ext',
         'project_name',
@@ -40,12 +36,12 @@ class Project extends Model
 
     public function status(): BelongsTo
     {
-        return $this->belongsTo(Status::class, 'status_id', 'status_id');
+        return $this->belongsTo(Status::class);
     }
 
     public function segment(): BelongsTo
     {
-        return $this->belongsTo(MarketSegment::class, 'market_segment_id', 'market_segment_id');
+        return $this->belongsTo(MarketSegment::class);
     }
 
     public function location(): BelongsTo
@@ -55,7 +51,7 @@ class Project extends Model
 
     public function architect(): BelongsTo
     {
-        return $this->belongsTo(Architect::class, 'architect_id', 'architect_id');
+        return $this->belongsTo(Architect::class);
     }
 
     public function architectAddress()
@@ -75,6 +71,6 @@ class Project extends Model
 
     public function quotes(): HasMany
     {
-        return $this->hasMany(Quote::class, 'project_id');
+        return $this->hasMany(Quote::class);
     }
 }

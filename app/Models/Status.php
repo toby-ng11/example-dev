@@ -8,10 +8,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Status extends Model
 {
-    protected $table = 'status';
-
-    protected $primaryKey = 'status_id';
-
     public $timestamps = false;
 
     protected $fillable = [
@@ -22,6 +18,6 @@ class Status extends Model
 
     public function projects(): HasMany
     {
-        return $this->hasMany(Project::class, 'status_id', 'status_id');
+        return $this->hasMany(Project::class);
     }
 }

@@ -16,7 +16,7 @@ class AdminController extends Controller
     public function projects()
     {
         $projects = P2qViewProject::select([
-            'project_id',
+            'id',
             'project_id_ext',
             'project_name',
             'owner_id',
@@ -27,7 +27,7 @@ class AdminController extends Controller
             'market_segment_desc',
             'status_desc',
         ])
-            ->orderByDesc('project_id')
+            ->orderByDesc('id')
             ->get();
 
         return response()->json($projects->toArray());

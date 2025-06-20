@@ -28,12 +28,12 @@ class Architect extends Model
 
     public function specifiers(): HasMany
     {
-        return $this->hasMany(Specifier::class, 'architect_id');
+        return $this->hasMany(Specifier::class);
     }
 
     public function projects(): HasMany
     {
-        return $this->hasMany(Project::class, 'architect_id');
+        return $this->hasMany(Project::class);
     }
 
     public function location(): BelongsTo
@@ -43,6 +43,6 @@ class Architect extends Model
 
     public function type(): BelongsTo
     {
-        return $this->belongsTo(ArchitectType::class, 'architect_type_id', 'architect_type_id');
+        return $this->belongsTo(ArchitectType::class);
     }
 }

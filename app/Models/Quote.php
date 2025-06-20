@@ -14,10 +14,6 @@ class Quote extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'quote';
-
-    protected $primaryKey = 'quote_id';
-
     protected $fillable = [
         'project_id',
         'quote_id_ext',
@@ -39,17 +35,17 @@ class Quote extends Model
 
     public function project(): BelongsTo
     {
-        return $this->belongsTo(Project::class, 'project_id', 'project_id');
+        return $this->belongsTo(Project::class);
     }
 
     public function status(): BelongsTo
     {
-        return $this->belongsTo(Status::class, 'status_id', 'status_id');
+        return $this->belongsTo(Status::class);
     }
 
     public function type(): BelongsTo
     {
-        return $this->belongsTo(QuoteType::class, 'type_id', 'type_id');
+        return $this->belongsTo(QuoteType::class);
     }
 
     public function contact(): BelongsTo
@@ -59,7 +55,7 @@ class Quote extends Model
 
     public function leadTime(): BelongsTo
     {
-        return $this->belongsTo(LeadTime::class, 'lead_time_id', 'lead_time_id');
+        return $this->belongsTo(LeadTime::class);
     }
 
     public function priceApproveBy(): BelongsTo
