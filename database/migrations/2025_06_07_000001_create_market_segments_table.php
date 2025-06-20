@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('market_segment', function (Blueprint $table) {
-            $table->id('market_segment_id');
+        Schema::create('market_segments', function (Blueprint $table) {
+            $table->id();
             $table->string('market_segment_desc', 255);
         });
     }
@@ -22,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('market_segment');
+        Schema::dropIfExists('market_segments');
     }
 };

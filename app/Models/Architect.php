@@ -13,10 +13,6 @@ class Architect extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'architect';
-
-    protected $primaryKey = 'architect_id';
-
     protected $fillable = [
         'architect_name',
         'architect_rep_id',
@@ -25,9 +21,9 @@ class Architect extends Model
         'class_id',
     ];
 
-    public function addresses(): HasMany
+    public function addresses()
     {
-        return $this->hasMany(Address::class, 'architect_id');
+        return $this->morphMany(Address::class, 'addressable');
     }
 
     public function specifiers(): HasMany

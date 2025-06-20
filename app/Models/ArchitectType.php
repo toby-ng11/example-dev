@@ -9,8 +9,6 @@ class ArchitectType extends Model
 {
     public $timestamps = false;
 
-    protected $primaryKey = 'architect_type_id';
-
     protected $fillable = [
         'architect_type_desc',
     ];

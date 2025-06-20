@@ -58,6 +58,11 @@ class Project extends Model
         return $this->belongsTo(Architect::class, 'architect_id', 'architect_id');
     }
 
+    public function architectAddress()
+    {
+        return $this->belongsTo(Address::class, 'architect_address_id');
+    }
+
     public function notes(): HasMany
     {
         return $this->hasMany(ProjectNote::class, 'project_id');

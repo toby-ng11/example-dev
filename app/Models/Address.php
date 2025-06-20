@@ -11,10 +11,6 @@ class Address extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'address';
-
-    protected $primaryKey = 'address_id';
-
     protected $fillable = [
         'name',
         'phys_address1',
@@ -29,6 +25,11 @@ class Address extends Model
         'architect_id',
         'specifier_id',
     ];
+
+    public function addressable()
+    {
+        return $this->morphTo();
+    }
 
     public function architect(): BelongsTo
     {

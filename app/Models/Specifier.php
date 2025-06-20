@@ -12,10 +12,6 @@ class Specifier extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'specifier';
-
-    protected $primaryKey = 'specifier_id';
-
     protected $fillable = [
         'first_name',
         'last_name',
@@ -24,9 +20,9 @@ class Specifier extends Model
         'address_id',
     ];
 
-    public function address(): HasOne
+    public function address()
     {
-        return $this->hasOne(Address::class, 'address_id', 'address_id');
+        return $this->morphOne(Address::class, 'addressable');
     }
 
     public function architect(): BelongsTo
