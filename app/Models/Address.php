@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Address extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -22,8 +22,6 @@ class Address extends Model
         'central_phone_number',
         'email_address',
         'url',
-        'architect_id',
-        'specifier_id',
     ];
 
     public function addressable()

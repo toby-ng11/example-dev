@@ -21,7 +21,7 @@ class P21UserFactory extends Factory
     public function definition(): array
     {
         $firstName = $this->faker->firstName();
-        $lastName = strtoupper($this->faker->lastName());
+        $lastName = $this->faker->lastName();
 
         $defaultCompany = 'TOR';
         $branch = '01';
@@ -36,8 +36,7 @@ class P21UserFactory extends Factory
             'default_location_id' => 101,
             'default_branch' => $branch,
             'role_uid' => $this->faker->randomNumber(3, true),
-            'email_address' => strtoupper(substr($firstName, 0, 1) . $lastName) . "@example.com",
-            'delete_flag' => 'N',
+            'email_address' => strtolower(substr($firstName, 0, 1)) . $lastName . "@example.com",
             'role' => "$defaultCompany - $roleName",
             'branch_description' => 'Main Branch',
             'first_name' => $firstName,

@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('default_branch', 8)->nullable();
             $table->integer('role_uid');
             $table->string('email_address', 255)->nullable();
-            $table->char('delete_flag', 1);
             $table->string('role', 128);
             $table->string('branch_description', 40)->nullable();
             $table->string('first_name', 20);

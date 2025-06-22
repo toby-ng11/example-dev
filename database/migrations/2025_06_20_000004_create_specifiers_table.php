@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('job_title');
-            $table->foreignId('address_id')->constrained();
+            $table->foreignId('architect_id')->constrained();
+            $table->foreignId('address_id')->nullable()->constrained();
             $table->timestamps();
             $table->softDeletes();
         });

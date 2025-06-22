@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MarketSegment extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
 
     protected $fillable = ['market_segment_desc'];
