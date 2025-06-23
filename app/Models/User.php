@@ -62,8 +62,18 @@ class User extends Authenticatable implements LdapAuthenticatable
         return $this->hasOne(P21User::class, 'id', 'username');
     }
 
-    public function projects(): HasMany
+    public function ownProjects(): HasMany
     {
         return $this->hasMany(Project::class, 'owner_id', 'username');
+    }
+
+    public function sharedProjects(): HasMany
+    {
+        return $this->hasMany(Project::class, 'shared_id', 'username');
+    }
+
+    public function lastMaintainedProjects(): HasMany
+    {
+        return $this->hasMany(Project::class, 'last_maintained_by', 'username');
     }
 }

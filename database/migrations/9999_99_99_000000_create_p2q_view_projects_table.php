@@ -66,6 +66,6 @@ WHERE p.deleted_at IS NULL;
      */
     public function down(): void
     {
-        Schema::dropIfExists('p2q_view_projects');
+        DB::statement("DROP VIEW IF EXISTS p2q_view_projects");
     }
 };

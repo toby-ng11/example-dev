@@ -39,7 +39,7 @@ class Project extends Model
         return $this->belongsTo(Status::class);
     }
 
-    public function segment(): BelongsTo
+    public function marketSegment(): BelongsTo
     {
         return $this->belongsTo(MarketSegment::class);
     }

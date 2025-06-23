@@ -22,7 +22,7 @@ import { Ellipsis, PlusCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface Project {
-    project_id: number;
+    id: number;
     project_id_ext: string;
     project_name: string;
     owner_id: string;
@@ -61,51 +61,60 @@ export default function ProjectTable() {
 
     const columns: ColumnDef<Project>[] = [
         {
-            accessorKey: 'project_id',
+            accessorKey: 'id',
             header: ({ column }) => <DataTableColumnHeader column={column} title="ID" className="justify-center" />,
-            cell: ({ row }) => <div className="text-center">{row.getValue('project_id')}</div>,
+            cell: ({ row }) => <div className="text-center">{row.getValue('id')}</div>,
             enableHiding: false,
+            meta: 'ID',
         },
         {
             header: 'Ext. ID',
             accessorKey: 'project_id_ext',
+            meta: 'Ext. ID',
         },
         {
             accessorKey: 'project_name',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
             cell: ({ row }) => <div className="max-w-[400px] truncate font-medium">{row.getValue('project_name')}</div>,
+            meta: 'Name',
         },
         {
             accessorKey: 'owner_id',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Owner" />,
+            meta: 'Owner',
         },
         {
             accessorKey: 'shared_id',
-            id: 'Shared',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Shared" />,
+            meta: 'Shared',
         },
         {
             accessorKey: 'created_at',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
             cell: ({ row }) => dayjs(row.getValue('created_at')).format('MMM D, YYYY'),
+            meta: 'Created At',
         },
         {
             accessorKey: 'due_date',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Due Date" />,
             cell: ({ row }) => dayjs(row.getValue('due_date')).format('MMM D, YYYY'),
+            meta: 'Due Date',
         },
         {
             accessorKey: 'architect_name',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Architect" />,
             cell: ({ row }) => <div className="max-w-[300px] truncate font-medium">{row.getValue('architect_name')}</div>,
+            meta: 'Architect',
         },
         {
             accessorKey: 'market_segment_desc',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Market Segment" />,
+            meta: 'Market Segment',
         },
         {
             accessorKey: 'status_desc',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+            meta: 'Status',
         },
         {
             accessorKey: 'options',
