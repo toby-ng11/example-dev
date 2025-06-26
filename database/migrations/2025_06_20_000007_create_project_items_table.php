@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('architects', function (Blueprint $table) {
+        Schema::create('project_items', function (Blueprint $table) {
             $table->id();
-            $table->string('architect_name')->unique();
-            $table->string('architect_rep_id', 30);
-            $table->string('company_id', 10);
-            $table->foreignId('architect_type_id')->constrained();
-            $table->string('class_id', 5)->nullable();
-            $table->integer('legacy_id')->nullable();
+            $table->string('item_code', 40);
+            $table->foreignId('project_id')->constrained()->onDelete('cascade');
+            $table->decimal('quantity', 18, 0);
+            $table->decimal('unit_price', 19, 2);
+            $table->string('unit_of_measure', 8);
+            $table->decimal('total_price', 19, 2);
+            $table->string('note', 255)->nullable();
             $table->string('created_by', 30);
             $table->string('updated_by', 30);
             $table->timestamps();
@@ -31,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('architects');
+        Schema::dropIfExists('project_items');
     }
 };

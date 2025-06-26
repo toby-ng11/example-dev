@@ -11,18 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('architects', function (Blueprint $table) {
+        Schema::create('project_shares', function (Blueprint $table) {
             $table->id();
-            $table->string('architect_name')->unique();
-            $table->string('architect_rep_id', 30);
-            $table->string('company_id', 10);
-            $table->foreignId('architect_type_id')->constrained();
-            $table->string('class_id', 5)->nullable();
-            $table->integer('legacy_id')->nullable();
+            $table->foreignId('project_id')->constrained()->onDelete('cascade');
+            $table->string('shared_user', 30);
+            $table->string('role', 30)->default('viewer'); // Default role is 'viewer'
             $table->string('created_by', 30);
             $table->string('updated_by', 30);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -31,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('architects');
+        Schema::dropIfExists('project_shares');
     }
 };

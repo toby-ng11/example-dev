@@ -1,3 +1,4 @@
+import { ColumnFilterDropdownButton } from '@/components/table-column-filter-button';
 import { DataTableViewOptions } from '@/components/table-column-toggle';
 import { DataTableColumnHeader } from '@/components/table-header';
 import { DataTablePagination } from '@/components/table-pagination';
@@ -25,7 +26,7 @@ interface Project {
     id: number;
     project_id_ext: string;
     project_name: string;
-    owner_id: string;
+    created_by: string;
     shared_id: string;
     created_at: string;
     due_date: string;
@@ -79,7 +80,7 @@ export default function ProjectTable() {
             meta: 'Name',
         },
         {
-            accessorKey: 'owner_id',
+            accessorKey: 'created_by',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Owner" />,
             meta: 'Owner',
         },
@@ -161,9 +162,8 @@ export default function ProjectTable() {
                                 onChange={(event) => table.getColumn('project_name')?.setFilterValue(event.target.value)}
                                 className="h-8 max-w-xs"
                             />
-                            <Button variant="outline" size="sm" className="border-dashed">
-                                <PlusCircle /> Owner
-                            </Button>
+                            <ColumnFilterDropdownButton table={table} columnId="created_by" label="Owner" />
+                            <ColumnFilterDropdownButton table={table} columnId="shared_id" label="Shared" />
                             <Button variant="outline" size="sm" className="border-dashed">
                                 <PlusCircle /> Shared
                             </Button>

@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('market_segments', function (Blueprint $table) {
-            $table->id();
-            $table->string('market_segment_desc', 255);
-            $table->integer('legacy_id')->nullable();
+        Schema::create('role_overrides', function (Blueprint $table) {
+            $table->string('id', 30);
+            $table->string('override_role', 10);
         });
     }
 
@@ -23,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('market_segments');
+        Schema::dropIfExists('role_overrides');
     }
 };

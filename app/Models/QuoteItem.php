@@ -9,24 +9,22 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class QuoteItem extends Model
 {
-    use SoftDeletes;
-
-    protected $primaryKey = 'item_uid';
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'item_id',
+        'item_code',
         'quote_id',
         'quantity',
         'unit_price',
-        'uom',
-        'subtotal',
+        'unit_of_measure',
+        'total_price',
         'note',
-        'added_by',
-        'last_maintained_by',
+        'created_by',
+        'updated_by',
     ];
 
     public function quote(): BelongsTo
     {
-        return $this->belongsTo(Quote::class, 'quote_id', 'quote_id');
+        return $this->belongsTo(Quote::class, 'quote_id');
     }
 }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('status_desc', 255);
             $table->char('project_flag', 1)->default('N');
             $table->char('quote_flag', 1)->default('N');
+            $table->integer('legacy_id')->nullable();
         });
     }
 

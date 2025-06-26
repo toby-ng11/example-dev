@@ -9,24 +9,22 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProjectItem extends Model
 {
-    use SoftDeletes;
-
-    protected $primaryKey = 'item_uid';
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'item_id',
+        'item_code',
         'project_id',
         'quantity',
         'unit_price',
-        'uom',
-        'subtotal',
+        'unit_of_measure',
+        'total_price',
         'note',
-        'added_by',
-        'last_maintained_by',
+        'created_by',
+        'updated_by',
     ];
 
     public function project(): BelongsTo
     {
-        return $this->belongsTo(Project::class, 'project_id', 'project_id');
+        return $this->belongsTo(Project::class, 'project_id');
     }
 }

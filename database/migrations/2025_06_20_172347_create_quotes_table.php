@@ -18,19 +18,20 @@ return new class extends Migration
             $table->foreignId('quote_type_id')->constrained();
             $table->unsignedBigInteger('contact_id');
             $table->timestamp('expire_date');
-            $table->timestamp('ship_required_date');
-            $table->timestamp('approve_date');
-            $table->foreignId('lead_time_id')->constrained();
+            $table->timestamp('ship_required_date')->nullable();
+            $table->timestamp('approve_date')->nullable();
+            $table->foreignId('lead_time_id')->nullable()->constrained();
             $table->text('note')->nullable();
             $table->foreignId('status_id')->constrained();
             $table->string('po_no', 50)->nullable();
-            $table->string('taker', 50)->nullable();
             $table->string('job_name', 40)->nullable();
             $table->string('price_approve_id', 50)->nullable();
-            $table->string('submit_by', 50)->nullable();
-            $table->string('approved_by', 50)->nullable();
+            $table->string('created_by', 30);
+            $table->string('approved_by', 30)->nullable();
+            $table->string('updated_by', 30);
             $table->softDeletes();
             $table->timestamps();
+            $table->integer('legacy_id')->nullable();
         });
     }
 

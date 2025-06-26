@@ -19,7 +19,7 @@ class AdminController extends Controller
             'id',
             'project_id_ext',
             'project_name',
-            'owner_id',
+            'created_by',
             'shared_id',
             'created_at',
             'due_date',
