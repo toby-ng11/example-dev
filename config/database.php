@@ -94,7 +94,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => 'required',
+            'sslmode' => 'require',
             'options' => extension_loaded('pdo_pgsql') ? [
                 PDO::ATTR_EMULATE_PREPARES => true, // <- Important: Prevent "cached plan must not change result type" errors on Neon/Postgres, without this
             ] : [],

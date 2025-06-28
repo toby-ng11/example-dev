@@ -10,6 +10,8 @@ import {
     ColumnFiltersState,
     flexRender,
     getCoreRowModel,
+    getFacetedRowModel,
+    getFacetedUniqueValues,
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
@@ -21,6 +23,7 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import { Ellipsis, PlusCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { DataTableFacetedFilter } from '../table-faceted-filter';
 
 interface Project {
     id: number;
@@ -134,10 +137,12 @@ export default function ProjectTable() {
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
-        onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
-        onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
+        getFacetedRowModel: getFacetedRowModel(),
+        getFacetedUniqueValues: getFacetedUniqueValues(),
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
         onColumnVisibilityChange: setColumnVisibility,
         state: {
             sorting,
@@ -160,13 +165,24 @@ export default function ProjectTable() {
                                 placeholder="Filter project names..."
                                 value={(table.getColumn('project_name')?.getFilterValue() as string) ?? ''}
                                 onChange={(event) => table.getColumn('project_name')?.setFilterValue(event.target.value)}
-                                className="h-8 max-w-xs"
+                                className="h-8 w-[150px] lg:w-[250px]"
                             />
                             <ColumnFilterDropdownButton table={table} columnId="created_by" label="Owner" />
                             <ColumnFilterDropdownButton table={table} columnId="shared_id" label="Shared" />
-                            <Button variant="outline" size="sm" className="border-dashed">
-                                <PlusCircle /> Shared
-                            </Button>
+                            {table.getColumn('created_by') && (
+                                <DataTableFacetedFilter
+                                    column={table.getColumn('created_by')}
+                                    title="Owner"
+                                    options={
+                                        table.getColumn('created_by')?.getFacetedUniqueValues()
+                                            ? Array.from(table.getColumn('created_by')!.getFacetedUniqueValues()!.keys()).map((value) => ({
+                                                  label: value ?? 'Unknown',
+                                                  value: value ?? '',
+                                              }))
+                                            : []
+                                    }
+                                />
+                            )}
                             <Button variant="outline" size="sm" className="border-dashed">
                                 <PlusCircle /> Architect
                             </Button>
@@ -187,24 +203,34 @@ export default function ProjectTable() {
                             <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
                                 {table.getHeaderGroups().map((headerGroup) => (
                                     <TableRow key={headerGroup.id}>
-                                        {headerGroup.headers.map((header) => (
-                                            <TableHead key={header.id} className="text-left whitespace-nowrap">
-                                                {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                            </TableHead>
-                                        ))}
+                                        {headerGroup.headers.map((header) => {
+                                            return (
+                                                <TableHead key={header.id} colSpan={header.colSpan}>
+                                                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                                </TableHead>
+                                            );
+                                        })}
                                     </TableRow>
                                 ))}
                             </TableHeader>
                             <TableBody>
-                                {table.getRowModel().rows.map((row) => (
-                                    <TableRow key={row.id}>
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id} className="p-2 text-left whitespace-nowrap">
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </TableCell>
-                                        ))}
+                                {table.getRowModel().rows?.length ? (
+                                    table.getRowModel().rows.map((row) => (
+                                        <TableRow key={row.id}>
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id} className="p-2 text-left whitespace-nowrap">
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={columns.length} className="h-24 text-center">
+                                            No projects found.
+                                        </TableCell>
                                     </TableRow>
-                                ))}
+                                )}
                             </TableBody>
                         </Table>
                     </div>

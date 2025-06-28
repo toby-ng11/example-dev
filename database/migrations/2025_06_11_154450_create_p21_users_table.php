@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('p21_users', function (Blueprint $table) {
+        Schema::connection('pgsql')->create('p21_users', function (Blueprint $table) {
             $table->string('id', 30)->primary();
             $table->string('name', 40);
             $table->string('default_company', 8)->nullable();
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('p21_users');
+        Schema::connection('pgsql')->dropIfExists('p21_users');
     }
 };
