@@ -17,6 +17,19 @@ interface DataTableFacetedFilterProps<TData, TValue> {
     }[];
 }
 
+export function getColumnOptions<TData>(column: Column<TData, unknown>): { label: string; value: string }[] {
+    const facets = column?.getFacetedUniqueValues();
+    if (!facets) return [];
+
+    return Array.from(facets.keys())
+        .filter((v): v is string => typeof v === 'string')
+        .sort()
+        .map((value) => ({
+            label: value,
+            value,
+        }));
+}
+
 export function DataTableFacetedFilter<TData, TValue>({ column, title, options }: DataTableFacetedFilterProps<TData, TValue>) {
     const facets = column?.getFacetedUniqueValues();
     const selectedValues = new Set(column?.getFilterValue() as string[]);
