@@ -1,9 +1,7 @@
-import { ColumnFilterDropdownButton } from '@/components/table-column-filter-button';
-import { DataTableViewOptions } from '@/components/table-column-toggle';
 import { DataTableColumnHeader } from '@/components/table-header';
 import { DataTablePagination } from '@/components/table-pagination';
+import { DataTableToolbar } from '@/components/table-toolbar';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
     ColumnDef,
@@ -22,9 +20,8 @@ import {
 } from '@tanstack/react-table';
 import axios from 'axios';
 import dayjs from 'dayjs';
-import { Ellipsis, PlusCircle } from 'lucide-react';
+import { Ellipsis } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { DataTableFacetedFilter, getColumnOptions } from '../table-faceted-filter';
 
 interface Project {
     id: number;
@@ -39,7 +36,7 @@ interface Project {
     status_desc: string;
 }
 
-const multiValueFilter: FilterFn<any> = (row, columnId, filterValue) => {
+const multiValueFilter: FilterFn<Project> = (row, columnId, filterValue) => {
     if (!Array.isArray(filterValue)) return true;
     const rowValue = row.getValue(columnId);
     return filterValue.includes(rowValue);
@@ -117,16 +114,19 @@ export default function ProjectTable() {
             accessorKey: 'architect_name',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Architect" />,
             cell: ({ row }) => <div className="max-w-[300px] truncate font-medium">{row.getValue('architect_name')}</div>,
+            filterFn: 'arrIncludesSome',
             meta: 'Architect',
         },
         {
             accessorKey: 'market_segment_desc',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Market Segment" />,
+            filterFn: 'arrIncludesSome',
             meta: 'Market Segment',
         },
         {
             accessorKey: 'status_desc',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+            filterFn: 'arrIncludesSome',
             meta: 'Status',
         },
         {
@@ -171,43 +171,20 @@ export default function ProjectTable() {
                     <p className="text-muted-foreground">Here's the list of all projects across all branches.</p>
                 </div>
                 <div className="flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex flex-1 items-center gap-2">
-                            <Input
-                                placeholder="Filter project names..."
-                                value={(table.getColumn('project_name')?.getFilterValue() as string) ?? ''}
-                                onChange={(event) => table.getColumn('project_name')?.setFilterValue(event.target.value)}
-                                className="h-8 w-[150px] lg:w-[250px]"
-                            />
-                            {table.getColumn('created_by') && (
-                                <DataTableFacetedFilter
-                                    column={table.getColumn('created_by')}
-                                    title="Owner"
-                                    options={getColumnOptions(table.getColumn('created_by')!)}
-                                />
-                            )}
-                            {table.getColumn('shared_id') && (
-                                <DataTableFacetedFilter
-                                    column={table.getColumn('shared_id')}
-                                    title="Shared"
-                                    options={getColumnOptions(table.getColumn('shared_id')!)}
-                                />
-                            )}
-                            <Button variant="outline" size="sm" className="border-dashed">
-                                <PlusCircle /> Architect
-                            </Button>
-                            <Button variant="outline" size="sm" className="border-dashed">
-                                <PlusCircle /> Market Segment
-                            </Button>
-                            <Button variant="outline" size="sm" className="border-dashed">
-                                <PlusCircle /> Status
-                            </Button>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <DataTableViewOptions table={table} />
-                            <Button size="sm">Add Project</Button>
-                        </div>
-                    </div>
+                    <DataTableToolbar
+                        table={table}
+                        searchColumn="project_name"
+                        searchPlaceholder="Filter project names..."
+                        showAddButton
+                        onAddClick={() => console.log('Add clicked')}
+                        facetedFilters={[
+                            { columnId: 'created_by', title: 'Owner' },
+                            { columnId: 'shared_id', title: 'Shared' },
+                            { columnId: 'architect_name', title: 'Architect' },
+                            { columnId: 'market_segment_desc', title: 'Market Segment' },
+                            { columnId: 'status_desc', title: 'Status' },
+                        ]}
+                    />
                     <div className="overflow-hidden rounded-md border">
                         <Table>
                             <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
