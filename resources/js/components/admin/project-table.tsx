@@ -1,5 +1,6 @@
 import { DataTableColumnHeader } from '@/components/table-header';
 import { DataTablePagination } from '@/components/table-pagination';
+import { DataTableLoadingSpinner } from '@/components/table-spinner';
 import { DataTableToolbar } from '@/components/table-toolbar';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -21,7 +22,7 @@ import {
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { Ellipsis } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Project {
     id: number;
@@ -47,6 +48,8 @@ export default function ProjectTable() {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+    const [isReady, setIsReady] = useState(false);
+    const lastSavedVisibility = useRef<VisibilityState>({});
 
     useEffect(() => {
         axios.get('/admin/projects').then((res) => setData(res.data));
@@ -55,17 +58,25 @@ export default function ProjectTable() {
     // Restore saved visibility
     useEffect(() => {
         axios.get('/api/preferences/projectTableColumnVisibility').then((res) => {
-            setColumnVisibility(res.data);
+            setColumnVisibility(res.data || {});
+            lastSavedVisibility.current = res.data;
+            setIsReady(true);
         });
     }, []);
 
     useEffect(() => {
-        if (Object.keys(columnVisibility).length > 0) {
+        if (!isReady) return;
+
+        const current = JSON.stringify(columnVisibility);
+        const previous = JSON.stringify(lastSavedVisibility.current);
+
+        if (current !== previous) {
             axios.post('/api/preferences/projectTableColumnVisibility', {
                 value: columnVisibility,
             });
+            lastSavedVisibility.current = columnVisibility;
         }
-    }, [columnVisibility]);
+    }, [columnVisibility, isReady]);
 
     const columns: ColumnDef<Project>[] = [
         {
@@ -185,42 +196,49 @@ export default function ProjectTable() {
                             { columnId: 'status_desc', title: 'Status' },
                         ]}
                     />
-                    <div className="overflow-hidden rounded-md border">
-                        <Table>
-                            <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
-                                {table.getHeaderGroups().map((headerGroup) => (
-                                    <TableRow key={headerGroup.id}>
-                                        {headerGroup.headers.map((header) => {
-                                            return (
-                                                <TableHead key={header.id} colSpan={header.colSpan}>
-                                                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                                </TableHead>
-                                            );
-                                        })}
-                                    </TableRow>
-                                ))}
-                            </TableHeader>
-                            <TableBody>
-                                {table.getRowModel().rows?.length ? (
-                                    table.getRowModel().rows.map((row) => (
-                                        <TableRow key={row.id}>
-                                            {row.getVisibleCells().map((cell) => (
-                                                <TableCell key={cell.id} className="p-2 text-left whitespace-nowrap">
-                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                </TableCell>
-                                            ))}
+
+                    {isReady ? (
+                        <div className="overflow-hidden rounded-md border">
+                            <Table>
+                                <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
+                                    {table.getHeaderGroups().map((headerGroup) => (
+                                        <TableRow key={headerGroup.id}>
+                                            {headerGroup.headers.map((header) => {
+                                                return (
+                                                    <TableHead key={header.id} colSpan={header.colSpan}>
+                                                        {header.isPlaceholder
+                                                            ? null
+                                                            : flexRender(header.column.columnDef.header, header.getContext())}
+                                                    </TableHead>
+                                                );
+                                            })}
                                         </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={columns.length} className="h-24 text-center">
-                                            No projects found.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
+                                    ))}
+                                </TableHeader>
+                                <TableBody>
+                                    {table.getRowModel().rows?.length ? (
+                                        table.getRowModel().rows.map((row) => (
+                                            <TableRow key={row.id}>
+                                                {row.getVisibleCells().map((cell) => (
+                                                    <TableCell key={cell.id} className="p-2 text-left whitespace-nowrap">
+                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                    </TableCell>
+                                                ))}
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={columns.length} className="h-24 text-center">
+                                                No projects found.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    ) : (
+                        <DataTableLoadingSpinner />
+                    )}
                 </div>
 
                 <DataTablePagination table={table} />
