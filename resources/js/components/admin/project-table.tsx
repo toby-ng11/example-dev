@@ -57,7 +57,7 @@ export default function ProjectTable() {
 
     // Restore saved visibility
     useEffect(() => {
-        axios.get('/api/api/preferences/projectTableColumnVisibility').then((res) => {
+        axios.get('/lapi/preferences/projectTableColumnVisibility').then((res) => {
             setColumnVisibility(res.data || {});
             lastSavedVisibility.current = res.data;
             setIsReady(true);
@@ -71,7 +71,7 @@ export default function ProjectTable() {
         const previous = JSON.stringify(lastSavedVisibility.current);
 
         if (current !== previous) {
-            axios.post('/api/api/preferences/projectTableColumnVisibility', {
+            axios.post('/lapi/preferences/projectTableColumnVisibility', {
                 value: columnVisibility,
             });
             lastSavedVisibility.current = columnVisibility;
