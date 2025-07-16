@@ -21,7 +21,7 @@ SELECT
     p.project_name,
     p.project_address,
     p.centura_location_id,
-    p.owner_id,
+    p.created_by,
     owner.email AS owner_email,
     p.shared_id,
     shared.email AS shared_email,
@@ -55,7 +55,7 @@ LEFT JOIN market_segments ms ON ms.id = p.market_segment_id
 LEFT JOIN specifiers sp ON sp.id = p.specifier_id
 LEFT JOIN architects a ON a.id = p.architect_id
 LEFT JOIN addresses aa ON aa.id = p.architect_address_id
-LEFT JOIN users owner ON owner.username = p.owner_id
+LEFT JOIN users owner ON owner.username = p.created_by
 LEFT JOIN users shared ON shared.username = p.shared_id
 WHERE p.deleted_at IS NULL;
         ");

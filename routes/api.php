@@ -9,6 +9,6 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
-    Route::get('/preferences/{key}', [PreferenceController::class, 'show']);
-    Route::post('/preferences/{key}', [PreferenceController::class, 'update']);
+    Route::get('preferences/{key}', [PreferenceController::class, 'show']);
+    Route::post('preferences/{key}', [PreferenceController::class, 'update']);
 });
