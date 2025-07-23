@@ -187,7 +187,6 @@ export default function ProjectTable() {
                         searchColumn="project_name"
                         searchPlaceholder="Filter project names..."
                         showAddButton
-                        onAddClick={() => console.log('Add clicked')}
                         facetedFilters={[
                             { columnId: 'created_by', title: 'Owner' },
                             { columnId: 'shared_id', title: 'Shared' },
