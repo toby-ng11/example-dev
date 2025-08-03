@@ -1,5 +1,5 @@
+import MarketSegmentTable from '@/components/admin/marktet-segments-table';
 import ProjectTable from '@/components/admin/project-table';
-import QuoteTable from '@/components/admin/quote-table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
@@ -18,7 +18,7 @@ export default function AdminDashboard() {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <ProjectTable />
 
-                <QuoteTable />
+                <MarketSegmentTable />
             </div>
         </AppLayout>
     );

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MarketSegment;
 use App\Models\Views\P2qViewProject;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -31,5 +32,16 @@ class AdminController extends Controller
             ->get();
 
         return response()->json($projects->toArray());
+    }
+
+    public function marketSegments()
+    {
+        $marketSegments = MarketSegment::select([
+            'id',
+            'market_segment_desc',
+        ])
+            ->get();
+
+        return response()->json($marketSegments->toArray());
     }
 }
