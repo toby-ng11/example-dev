@@ -11,17 +11,40 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { BookOpen, BookUser, Folder, Home, LayoutGrid, Menu, Search, ShieldCheck } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-];
+function getMainNavItems(userRole: string | null): NavItem[] {
+    const base: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+            icon: LayoutGrid,
+        },
+        {
+            title: 'Project Dashboard',
+            href: '/projects',
+            icon: Home,
+        },
+        {
+            title: 'Architect Dashboard',
+            href: '/architects',
+            icon: BookUser,
+        },
+        {
+            title: 'Quote Dashboard',
+            href: '/quotes',
+            icon: LayoutGrid,
+        },
+    ];
+
+    if (userRole === 'admin') {
+        base.unshift({ title: 'Admin Dashboard', href: '/admin', icon: ShieldCheck });
+    }
+
+    return [...base]; // ensure return is always a fresh array
+}
 
 const rightNavItems: NavItem[] = [
     {
@@ -46,6 +69,9 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
+    const { props } = usePage();
+    const userRole = props.userRole as string | null;
+    const mainNavItems = getMainNavItems(userRole);
     return (
         <>
             <div className="border-sidebar-border/80 border-b">

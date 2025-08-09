@@ -10,10 +10,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import axios from 'axios';
 import { EllipsisVertical } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 interface RowOptionsProps {
     rowId?: string | number;
@@ -22,30 +20,22 @@ interface RowOptionsProps {
     onEdit?: () => void;
     onCopy?: () => void;
     onFavorite?: () => void;
+    onDelete?: () => Promise<boolean | undefined>;
+    deleteAlertDescription?: string;
 }
 
-export default function DataTableRowOptions({ rowId, canCopy = false, canFavorite = false, onEdit, onCopy, onFavorite }: RowOptionsProps) {
+export default function DataTableRowOptions({
+    rowId,
+    canCopy = false,
+    canFavorite = false,
+    onEdit,
+    onCopy,
+    onFavorite,
+    onDelete,
+    deleteAlertDescription,
+}: RowOptionsProps) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-
-    async function handleDelete() {
-        if (!rowId) return;
-        setLoading(true);
-        try {
-            const { data } = await axios.get(`/check-exist/projects?marketsegment=${rowId}`);
-            if (data.exists) {
-                toast.warning(`Cannot delete market segment #${rowId} — it still has projects.`);
-                return;
-            }
-            await axios.delete(`/market-segments/${rowId}`);
-            setOpen(false);
-        } catch (error) {
-            toast.warning(`Error: ${error}.`);
-        } finally {
-            setLoading(false);
-        }
-    }
-
     return (
         <>
             <DropdownMenu modal={false}>
@@ -72,8 +62,7 @@ export default function DataTableRowOptions({ rowId, canCopy = false, canFavorit
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the market segment.
-                            <span className="font-medium"> #{rowId}</span>.
+                            {deleteAlertDescription ?? `This action cannot be undone. This will permanently delete the field #${rowId}.`}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -81,7 +70,14 @@ export default function DataTableRowOptions({ rowId, canCopy = false, canFavorit
                         <AlertDialogAction
                             disabled={loading}
                             className="bg-destructive dark:bg-destructive/50 dark:hover:bg-destructive/60 hover:bg-destructive/90 text-white"
-                            onClick={handleDelete}
+                            onClick={async () => {
+                                setLoading(true);
+                                const success = await onDelete?.();
+                                if (success) {
+                                    setOpen(false);
+                                }
+                                setLoading(false);
+                            }}
                         >
                             {loading ? 'Deleting...' : 'Delete'}
                         </AlertDialogAction>

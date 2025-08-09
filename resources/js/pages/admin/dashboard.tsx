@@ -9,6 +9,10 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Admin Dashboard',
         href: '/admin',
     },
+    {
+        title: 'Architect Dashboard',
+        href: '/architect',
+    },
 ];
 
 export default function AdminDashboard() {

@@ -4,7 +4,6 @@ import { DataTableLoadingSpinner } from '@/components/table-spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
     ColumnDef,
-    FilterFn,
     flexRender,
     getCoreRowModel,
     getFacetedRowModel,
@@ -27,19 +26,13 @@ interface MarketSegment {
     market_segment_desc: string;
 }
 
-const multiValueFilter: FilterFn<MarketSegment> = (row, columnId, filterValue) => {
-    if (!Array.isArray(filterValue)) return true;
-    const rowValue = row.getValue(columnId);
-    return filterValue.includes(rowValue);
-};
-
 export default function MarketSegmentTable() {
     const [data, setData] = useState<MarketSegment[]>([]);
     const [sorting, setSorting] = useState<SortingState>([{ id: 'id', desc: false }]);
     const [isReady, setIsReady] = useState(false);
-
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const [editedValue, setEditedValue] = useState<string>('');
+    const [isCreatingNew, setIsCreatingNew] = useState(false);
 
     useEffect(() => {
         axios.get('/market-segments').then((res) => {
@@ -50,18 +43,47 @@ export default function MarketSegmentTable() {
 
     const handleSave = async (rowId: number, editedValue: string) => {
         try {
-            const { data } = await axios.put(`/market-segments/${rowId}`, {
-                market_segment_desc: editedValue,
-            });
-            if (data) {
-                setEditingRowId(null);
-                setEditedValue('');
-                toast.success(data.message);
-                setData((prev) => prev.map((row) => (row.id === rowId ? { ...row, market_segment_desc: editedValue } : row)));
+            if (rowId === 0) {
+                const response = await axios.post('/market-segments', {
+                    market_segment_desc: editedValue,
+                });
+
+                const newSegment = response.data;
+
+                // Replace temp row with real one
+                setData((prev) => [newSegment, ...prev.filter((row) => row.id !== 0)]);
+                toast.success(`Saved: ${editedValue}.`);
+            } else {
+                const { data } = await axios.put(`/market-segments/${rowId}`, {
+                    market_segment_desc: editedValue,
+                });
+                if (data) {
+                    setEditingRowId(null);
+                    setEditedValue('');
+                    toast.success(data.message);
+                    setData((prev) => prev.map((row) => (row.id === rowId ? { ...row, market_segment_desc: editedValue } : row)));
+                }
             }
         } catch (err) {
             console.error(err);
             alert('Failed to update segment.');
+        }
+    };
+
+    const handleDelete = async (rowId: number) => {
+        if (!rowId) return;
+        try {
+            const { data } = await axios.delete(`/market-segments/${rowId}`);
+            if (data.exists) {
+                toast.warning(`Cannot delete market segment #${rowId} — it still has projects.`);
+                return;
+            }
+            setData((prev) => prev.filter((row) => row.id !== rowId));
+            toast.success(data.message);
+            return true;
+        } catch (error) {
+            toast.warning(`Error: ${error}.`);
+            return false;
         }
     };
 
@@ -76,7 +98,6 @@ export default function MarketSegmentTable() {
         {
             accessorKey: 'market_segment_desc',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Market Segment" />,
-            filterFn: 'arrIncludesSome',
             enableHiding: false,
             meta: 'Market Segment',
             cell: ({ row }) => {
@@ -129,6 +150,10 @@ export default function MarketSegmentTable() {
                                 variant="outline"
                                 className="size-8 text-red-600 hover:text-red-800"
                                 onClick={() => {
+                                    if (editingRowId === 0) {
+                                        setData((prev) => prev.filter((row) => row.id !== 0));
+                                        setIsCreatingNew(false);
+                                    }
                                     setEditingRowId(null);
                                     setEditedValue('');
                                 }}
@@ -145,6 +170,9 @@ export default function MarketSegmentTable() {
                                 setEditingRowId(rowId);
                                 setEditedValue(row.getValue('market_segment_desc'));
                             }}
+                            onDelete={() => handleDelete(rowId)}
+                            deleteAlertDescription={`This action cannot be undone. This will permanently delete the market segment: ${row.original.market_segment_desc}.
+                            It can't be deleted if still used by projects or opportunities.`}
                         />
                     );
                 }
@@ -166,16 +194,30 @@ export default function MarketSegmentTable() {
         state: {
             sorting,
         },
-        filterFns: {
-            multi: multiValueFilter,
-        },
     });
 
     return (
         <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
             <div className="flex flex-1 flex-col gap-4 p-2">
                 <div className="absolute top-4 right-4 z-10">
-                    <Button title="Add new shared user" variant="outline" className="size-8">
+                    <Button
+                        title="Add new shared user"
+                        variant="outline"
+                        className="size-8"
+                        onClick={() => {
+                            if (isCreatingNew) return;
+
+                            const tempRow = {
+                                id: 0,
+                                market_segment_desc: '',
+                            };
+
+                            setData((prev) => [tempRow, ...prev]);
+                            setEditedValue('');
+                            setEditingRowId(0);
+                            setIsCreatingNew(true);
+                        }}
+                    >
                         <Plus />
                     </Button>
                 </div>

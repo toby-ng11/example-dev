@@ -34,7 +34,10 @@ class MarketSegmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $segment = new MarketSegment;
+        $segment->market_segment_desc = $request->market_segment_desc;
+        $segment->save();
+        return response()->json($segment);
     }
 
     /**
@@ -70,7 +73,16 @@ class MarketSegmentController extends Controller
      */
     public function destroy(MarketSegment $marketSegment)
     {
-        //
+        $exists = $marketSegment->projects()->exists();
+        if ($exists) {
+            return response()->json([
+                'exists' => $exists,
+            ]);
+        }
+
+        $marketSegment->delete();
+
+        return response()->json(['message' => 'Deleted successfully']);
     }
 
     public function checkIfProjectExists(Request $request, MarketSegment $marketSegment)

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MarketSegment;
+use App\Models\Status;
 use App\Models\Views\P2qViewProject;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
