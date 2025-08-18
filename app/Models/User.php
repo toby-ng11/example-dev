@@ -19,13 +19,16 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements LdapAuthenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /**
+     * @use HasFactory<\Database\Factories\UserFactory>
+     * @use HasApiTokens<\Laravel\Sanctum\Contracts\HasAbilities>
+     */
     use HasApiTokens, HasFactory, Notifiable, AuthenticatesWithLdap, HasLdapUser;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
@@ -37,7 +40,7 @@ class User extends Authenticatable implements LdapAuthenticatable
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<string>
      */
     protected $hidden = [
         'password',
@@ -49,6 +52,7 @@ class User extends Authenticatable implements LdapAuthenticatable
      *
      * @return array<string, string>
      */
+    #[\Override]
     protected function casts(): array
     {
         return [

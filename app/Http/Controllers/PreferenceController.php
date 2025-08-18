@@ -9,7 +9,7 @@ class PreferenceController extends Controller
 {
     public function show(Request $request, string $key)
     {
-        $pref = UserPreference::where('user_id', $request->user()->id)
+        $pref = UserPreference::where('user_id', $request->user()->username)
             ->where('key', $key)
             ->first();
 
@@ -19,7 +19,7 @@ class PreferenceController extends Controller
     public function update(Request $request, string $key)
     {
         $pref = UserPreference::updateOrCreate(
-            ['user_id' => $request->user()->id, 'key' => $key],
+            ['user_id' => $request->user()->username, 'key' => $key],
             ['value' => $request->input('value')]
         );
 

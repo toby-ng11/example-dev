@@ -2,37 +2,57 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
+import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, BookUser, Folder, Home, LayoutGrid, ShieldCheck } from 'lucide-react';
+import { BookOpen, Folder, Home, LayoutGrid, List, ShieldCheck } from 'lucide-react';
 import AppLogo from './app-logo';
 
 function getMainNavItems(userRole: string | null): NavItem[] {
     const base: NavItem[] = [
         {
-            title: 'Dashboard',
-            href: '/dashboard',
-            icon: LayoutGrid,
-        },
-        {
-            title: 'Project Dashboard',
-            href: '/projects',
+            title: 'Home',
+            href: '/dashboard/home',
             icon: Home,
         },
         {
-            title: 'Architect Dashboard',
-            href: '/architects',
-            icon: BookUser,
+            title: 'Opportunities',
+            href: '/dashboard/opportunity',
+            icon: LayoutGrid,
         },
         {
-            title: 'Quote Dashboard',
-            href: '/quotes',
+            title: 'Projects',
+            href: '/dashboard/project',
             icon: LayoutGrid,
+        },
+        {
+            title: 'Quotes',
+            href: '/dashboard/quote',
+            icon: LayoutGrid,
+        },
+        {
+            title: 'Architects',
+            href: '/dashboard/architect',
+            icon: LayoutGrid,
+        },
+        {
+            title: 'Quoted Items',
+            href: '/dashboard/quoted-items',
+            icon: List,
         },
     ];
 
+    if (userRole === 'guest') {
+        return [
+            {
+                title: 'Quoted Items',
+                href: '/dashboard/quoted-items',
+                icon: List,
+            },
+        ];
+    }
+
     if (userRole === 'admin') {
-        base.unshift({ title: 'Admin Dashboard', href: '/admin', icon: ShieldCheck });
+        base.unshift({ title: 'Admin Dashboard', href: '/dashboard/admin', icon: ShieldCheck });
     }
 
     return [...base]; // ensure return is always a fresh array
@@ -52,9 +72,9 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
-    const { props } = usePage();
+    const { user } = usePage<SharedData>().props.auth;
 
-    const userRole = props.userRole as string | null;
+    const userRole = user.p2q_system_role;
 
     const mainNavItems = getMainNavItems(userRole);
 
@@ -64,7 +84,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" prefetch>
+                            <Link href="/" prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

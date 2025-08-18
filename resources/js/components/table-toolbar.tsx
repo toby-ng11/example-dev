@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Table } from '@tanstack/react-table';
 import { PlusCircle } from 'lucide-react';
-import DialogProject from './dialog-project';
+import { ReactNode } from 'react';
 
 interface FacetedFilterConfig {
     columnId: string;
@@ -16,23 +16,32 @@ interface DataTableToolbarProps<TData> {
     table: Table<TData>;
     facetedFilters?: FacetedFilterConfig[];
     showAddButton?: boolean;
+    onAddClick?: () => void;
     searchColumn?: string;
     searchPlaceholder?: string;
+    searchByItem?: boolean;
+    customFilter?: ReactNode;
+    searchAfterFilter?: boolean;
 }
 
 export function DataTableToolbar<TData>({
     table,
     facetedFilters = [],
     showAddButton = false,
+    onAddClick,
     searchColumn = 'project_name',
     searchPlaceholder = 'Filter...',
+    customFilter,
+    searchAfterFilter = false,
 }: DataTableToolbarProps<TData>) {
     const searchCol = table.getColumn(searchColumn);
 
     return (
         <div className="flex items-center justify-between">
             <div className="flex flex-1 items-center gap-2">
-                {searchCol && (
+                {customFilter && !searchAfterFilter}
+
+                {!customFilter && !searchAfterFilter && searchCol && (
                     <Input
                         placeholder={searchPlaceholder}
                         value={(searchCol.getFilterValue() as string) ?? ''}
@@ -71,11 +80,26 @@ export function DataTableToolbar<TData>({
                         </Popover>
                     </div>
                 </>
+
+                {customFilter && searchAfterFilter}
+
+                {!customFilter && searchAfterFilter && searchCol && (
+                    <Input
+                        placeholder={searchPlaceholder}
+                        value={(searchCol.getFilterValue() as string) ?? ''}
+                        onChange={(event) => searchCol.setFilterValue(event.target.value)}
+                        className="h-8 w-[150px] lg:w-[250px]"
+                    />
+                )}
             </div>
 
             <div className="flex items-center gap-4">
                 <DataTableViewOptions table={table} />
-                {showAddButton && <DialogProject />}
+                {showAddButton && (
+                    <Button className="text-white" size="sm" onClick={onAddClick}>
+                        <PlusCircle className="mr-1 size-4" /> Add Project
+                    </Button>
+                )}
             </div>
         </div>
     );

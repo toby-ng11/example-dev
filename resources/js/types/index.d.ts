@@ -36,25 +36,8 @@ export interface User {
     name: string;
     email: string;
     avatar?: string;
-    email_verified_at: string | null;
-    created_at: string;
-    updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
-}
-
-declare global {
-    namespace App {
-        interface PageProps {
-            [key: string]: unknown;
-            auth: {
-                user: User | null;
-            };
-            flash?: {
-                message?: string;
-                error?: string;
-                success?: string;
-            };
-            errors?: Record<string, string>;
-        }
-    }
+    role: string;
+    p2q_system_role: string;
+    default_company: string;
+    default_location_id: string;
 }

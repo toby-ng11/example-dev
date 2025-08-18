@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('total_price', 19, 2);
             $table->string('note', 255)->nullable();
             $table->string('created_by', 30);
-            $table->string('updated_by', 30);
+            $table->string('updated_by', 30)->nullable();;
             $table->timestamps();
             $table->softDeletes();
         });
