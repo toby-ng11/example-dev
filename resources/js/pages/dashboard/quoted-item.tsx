@@ -18,5 +18,5 @@ export default function QuotedItemDashboard() {
                 <QuotedItemTable />
             </div>
         </AppLayout>
-    );
+   );
 }

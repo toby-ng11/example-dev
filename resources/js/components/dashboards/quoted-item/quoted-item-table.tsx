@@ -1,15 +1,14 @@
 import { DataTableColumnHeader } from '@/components/table-header';
+import DataTableMain from '@/components/table-main';
 import { DataTablePagination } from '@/components/table-pagination';
-import DataTableRefreshDataButton from '@/components/table-refresh-data-button';
+import { DataTableRefreshButton } from '@/components/table-refresh-button';
 import { DataTableSkeleton } from '@/components/table-skeleton';
 import { DataTableToolbar } from '@/components/table-toolbar';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { fetchWithCache } from '@/hooks/use-cache';
+import { useTanStackQuery } from '@/hooks/use-query';
 import {
     ColumnDef,
     ColumnFiltersState,
     FilterFn,
-    flexRender,
     getCoreRowModel,
     getFacetedRowModel,
     getFacetedUniqueValues,
@@ -45,30 +44,16 @@ const multiValueFilter: FilterFn<QuotedItem> = (row, columnId, filterValue) => {
 };
 
 export default function QuotedItemTable() {
-    const [data, setData] = useState<QuotedItem[]>([]);
+    const ENDPOINT = '/dashboard/quoted-items/items';
+    const qKey = ['quoted_items'];
+
+    const { data: quotedItems = [], isLoading, isFetching, refetch, dataUpdatedAt } = useTanStackQuery<QuotedItem>(ENDPOINT, qKey);
     const [sorting, setSorting] = useState<SortingState>([{ id: 'quote_id', desc: true }]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
     const [isReady, setIsReady] = useState(false);
-    const [isFetching, setIsFetching] = useState(false);
     const lastSavedVisibility = useRef<VisibilityState>({});
     const [globalFilter, setGlobalFilter] = useState('');
-
-    const ENDPOINT = '/dashboard/quoted-items/items';
-
-    const fetchData = async (force = false) => {
-        setIsFetching(false);
-        try {
-            const rows = await fetchWithCache<QuotedItem[]>(ENDPOINT, { ttlMs: 300000, force });
-            setData(rows);
-        } finally {
-            setIsFetching(true);
-        }
-    };
-
-    useEffect(() => {
-        fetchData();
-    }, []);
 
     // Restore saved visibility
     useEffect(() => {
@@ -155,7 +140,7 @@ export default function QuotedItemTable() {
     ];
 
     const table = useReactTable({
-        data,
+        data: quotedItems,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -191,8 +176,12 @@ export default function QuotedItemTable() {
 
     return (
         <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-full flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
-            <DataTableRefreshDataButton fetchTableData={() => fetchData(true)} isTableReady={isReady} isTableFetching={isFetching} />
-
+            <DataTableRefreshButton
+                onRefresh={() => refetch({ cancelRefetch: true })}
+                isFetching={isFetching}
+                isReady={isReady}
+                dataUpdatedAt={dataUpdatedAt}
+            />
             <div className="flex flex-1 flex-col gap-4 p-2">
                 <div className="flex flex-col gap-1">
                     <h2 className="text-2xl font-semibold tracking-tight">All Quoted Items</h2>
@@ -200,7 +189,7 @@ export default function QuotedItemTable() {
                 </div>
 
                 <div className="flex flex-col gap-4 overflow-auto">
-                    {isReady && isFetching ? (
+                    {!isLoading && !isFetching && isReady ? (
                         <>
                             <DataTableToolbar
                                 table={table}
@@ -214,51 +203,15 @@ export default function QuotedItemTable() {
                                 searchAfterFilter={true}
                             />
 
-                            <div className="overflow-hidden rounded-md border">
-                                <Table>
-                                    <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
-                                        {table.getHeaderGroups().map((headerGroup) => (
-                                            <TableRow key={headerGroup.id}>
-                                                {headerGroup.headers.map((header) => {
-                                                    return (
-                                                        <TableHead key={header.id} colSpan={header.colSpan}>
-                                                            {header.isPlaceholder
-                                                                ? null
-                                                                : flexRender(header.column.columnDef.header, header.getContext())}
-                                                        </TableHead>
-                                                    );
-                                                })}
-                                            </TableRow>
-                                        ))}
-                                    </TableHeader>
-                                    <TableBody>
-                                        {table.getRowModel().rows?.length ? (
-                                            table.getRowModel().rows.map((row) => (
-                                                <TableRow key={row.id}>
-                                                    {row.getVisibleCells().map((cell) => (
-                                                        <TableCell key={cell.id} className="p-2 text-left whitespace-nowrap">
-                                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                        </TableCell>
-                                                    ))}
-                                                </TableRow>
-                                            ))
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                                    No quotes found.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </div>
+                            <DataTableMain table={table} columns={columns} />
+                            <DataTablePagination table={table} hasSelect={false} />
                         </>
                     ) : (
                         <DataTableSkeleton rows={15} cols={5} />
                     )}
                 </div>
 
-                <DataTablePagination table={table} hasSelect={false} />
+
             </div>
         </div>
     );

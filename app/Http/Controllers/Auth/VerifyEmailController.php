@@ -14,11 +14,14 @@ class VerifyEmailController extends Controller
      */
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
-        if ($request->user()->hasVerifiedEmail()) {
+        /** @var \App\Models\User|\LdapRecord\Models\ActiveDirectory\User $user */
+        $user = $request->user();
+
+        if ($user instanceof \App\Models\User && $user->hasVerifiedEmail()) {
             return redirect()->intended(route('home', absolute: false).'?verified=1');
         }
 
-        if ($request->user()->markEmailAsVerified()) {
+        if ($user instanceof \App\Models\User && $user->markEmailAsVerified()) {
             /** @var \Illuminate\Contracts\Auth\MustVerifyEmail $user */
             $user = $request->user();
 
