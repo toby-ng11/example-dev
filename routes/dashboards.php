@@ -9,12 +9,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::name('dashboard.')->group(function () {
                 Route::get('/home', 'home')->name('home');
 
-                Route::get('/admin', 'admin')->name('admin');
+                Route::middleware('admin')->group(function () {
+                    Route::get('/admin', 'admin')->name('admin');
 
-                Route::prefix('/admin')->group(function () {
-                    Route::get('/projects', 'adminProjects');
-                    Route::get('/quotes', 'adminQuotes');
-                    Route::get('/users', 'adminUsers');
+                    Route::prefix('/admin')->group(function () {
+                        Route::get('/projects', 'adminProjects');
+                        Route::get('/quotes', 'adminQuotes');
+                        Route::get('/users', 'adminUsers');
+                    });
                 });
 
                 Route::get('/opportunity', 'opportunity')->name('opportunity');

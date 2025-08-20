@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MarketSegment;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MarketSegmentController extends Controller
@@ -10,14 +11,9 @@ class MarketSegmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        $marketSegments = MarketSegment::select([
-            'id',
-            'market_segment_desc',
-        ])
-            ->get();
-
+        $marketSegments = MarketSegment::all();
         return response()->json($marketSegments->toArray());
     }
 
@@ -32,7 +28,7 @@ class MarketSegmentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $segment = new MarketSegment;
         $segment->market_segment_desc = $request->market_segment_desc;
@@ -59,7 +55,7 @@ class MarketSegmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, MarketSegment $marketSegment)
+    public function update(Request $request, MarketSegment $marketSegment): JsonResponse
     {
         $marketSegment->update($request->only('market_segment_desc'));
         return response()->json([
@@ -71,7 +67,7 @@ class MarketSegmentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(MarketSegment $marketSegment)
+    public function destroy(MarketSegment $marketSegment): JsonResponse
     {
         $exists = $marketSegment->projects()->exists();
         if ($exists) {
@@ -83,20 +79,5 @@ class MarketSegmentController extends Controller
         $marketSegment->delete();
 
         return response()->json(['message' => 'Deleted successfully']);
-    }
-
-    public function checkIfProjectExists(Request $request, MarketSegment $marketSegment)
-    {
-        $id = $request->query('marketsegment');
-
-        if (!is_numeric($id)) {
-            return response()->json(['error' => 'Invalid ID'], 400);
-        }
-
-        $exists = $marketSegment::where('id', $id)
-            ->whereHas('projects')
-            ->exists();
-
-        return response()->json(['exists' => $exists]);
     }
 }

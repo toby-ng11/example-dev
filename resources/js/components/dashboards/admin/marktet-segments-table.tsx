@@ -1,10 +1,14 @@
 import { DataTableColumnHeader } from '@/components/table-header';
+import DataTableMain from '@/components/table-main';
 import DataTableRowOptions from '@/components/table-row-options';
-import { DataTableLoadingSpinner } from '@/components/table-spinner';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { DataTableSkeleton } from '@/components/table-skeleton';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useTanStackQuery } from '@/hooks/use-query';
 import {
     ColumnDef,
-    flexRender,
     getCoreRowModel,
     getFacetedRowModel,
     getFacetedUniqueValues,
@@ -16,10 +20,8 @@ import {
 } from '@tanstack/react-table';
 import axios from 'axios';
 import { Plus, Save, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
 
 interface MarketSegment {
     id: number;
@@ -27,19 +29,16 @@ interface MarketSegment {
 }
 
 export default function MarketSegmentTable() {
-    const [data, setData] = useState<MarketSegment[]>([]);
     const [sorting, setSorting] = useState<SortingState>([{ id: 'id', desc: false }]);
-    const [isReady, setIsReady] = useState(false);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const [editedValue, setEditedValue] = useState<string>('');
-    const [isCreatingNew, setIsCreatingNew] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [newSegmentDesc, setNewSegmentDesc] = useState('');
 
-    useEffect(() => {
-        axios.get('/market-segments').then((res) => {
-            setData(res.data);
-            setIsReady(true);
-        });
-    }, []);
+    const ENDPOINT = '/market-segments';
+    const qKey = ['admin', 'market-segments'];
+
+    const { data: marketSegments = [], isLoading, isFetching, refetch } = useTanStackQuery<MarketSegment>(ENDPOINT, qKey);
 
     const handleSave = async (rowId: number, editedValue: string) => {
         try {
@@ -48,11 +47,12 @@ export default function MarketSegmentTable() {
                     market_segment_desc: editedValue,
                 });
 
-                const newSegment = response.data;
-
-                // Replace temp row with real one
-                setData((prev) => [newSegment, ...prev.filter((row) => row.id !== 0)]);
-                toast.success(`Saved: ${editedValue}.`);
+                if (response.data) {
+                    refetch();
+                    toast.success(`Saved: ${editedValue}.`);
+                } else {
+                    toast.error(`Error! Please check log for more detail.`);
+                }
             } else {
                 const { data } = await axios.put(`/market-segments/${rowId}`, {
                     market_segment_desc: editedValue,
@@ -61,7 +61,7 @@ export default function MarketSegmentTable() {
                     setEditingRowId(null);
                     setEditedValue('');
                     toast.success(data.message);
-                    setData((prev) => prev.map((row) => (row.id === rowId ? { ...row, market_segment_desc: editedValue } : row)));
+                    refetch();
                 }
             }
         } catch (err) {
@@ -78,7 +78,7 @@ export default function MarketSegmentTable() {
                 toast.warning(`Cannot delete market segment #${rowId} — it still has projects.`);
                 return;
             }
-            setData((prev) => prev.filter((row) => row.id !== rowId));
+            refetch();
             toast.success(data.message);
             return true;
         } catch (error) {
@@ -150,10 +150,6 @@ export default function MarketSegmentTable() {
                                 variant="outline"
                                 className="size-8 text-red-600 hover:text-red-800"
                                 onClick={() => {
-                                    if (editingRowId === 0) {
-                                        setData((prev) => prev.filter((row) => row.id !== 0));
-                                        setIsCreatingNew(false);
-                                    }
                                     setEditingRowId(null);
                                     setEditedValue('');
                                 }}
@@ -182,7 +178,7 @@ export default function MarketSegmentTable() {
     ];
 
     const table = useReactTable({
-        data,
+        data: marketSegments,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -200,26 +196,60 @@ export default function MarketSegmentTable() {
         <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
             <div className="flex flex-1 flex-col gap-4 p-2">
                 <div className="absolute top-4 right-4 z-10">
-                    <Button
-                        title="Add new shared user"
-                        variant="outline"
-                        className="size-8"
-                        onClick={() => {
-                            if (isCreatingNew) return;
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button title="Add new market segment" variant="outline" className="size-8">
+                                <Plus className="h-4 w-4" />
+                            </Button>
+                        </DialogTrigger>
 
-                            const tempRow = {
-                                id: 0,
-                                market_segment_desc: '',
-                            };
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Add Market Segment</DialogTitle>
+                                <DialogDescription>Enter a new market segment description and click Save.</DialogDescription>
+                            </DialogHeader>
 
-                            setData((prev) => [tempRow, ...prev]);
-                            setEditedValue('');
-                            setEditingRowId(0);
-                            setIsCreatingNew(true);
-                        }}
-                    >
-                        <Plus />
-                    </Button>
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="desc">Market Segment</Label>
+                                <Input
+                                    id="desc"
+                                    value={newSegmentDesc}
+                                    onChange={(e) => setNewSegmentDesc(e.target.value)}
+                                    placeholder="e.g. Retail, Hospitality..."
+                                    autoFocus
+                                />
+                            </div>
+
+                            <DialogFooter>
+                                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={async () => {
+                                        if (!newSegmentDesc.trim()) return;
+
+                                        try {
+                                            const response = await axios.post('/market-segments', {
+                                                market_segment_desc: newSegmentDesc,
+                                            });
+
+                                            if (response.data) {
+                                                refetch();
+                                                toast.success(`Market segment added!`);
+                                                setNewSegmentDesc('');
+                                                setIsDialogOpen(false);
+                                            }
+                                        } catch (err) {
+                                            toast.error('Failed to add segment.');
+                                            console.error(err);
+                                        }
+                                    }}
+                                >
+                                    Save
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
 
                 <div className="flex flex-col gap-1">
@@ -227,48 +257,7 @@ export default function MarketSegmentTable() {
                     <p className="text-muted-foreground">Project and opportunity segments can be added or editted here.</p>
                 </div>
                 <div className="flex flex-col gap-4">
-                    {isReady ? (
-                        <div className="overflow-hidden rounded-md border">
-                            <Table>
-                                <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
-                                    {table.getHeaderGroups().map((headerGroup) => (
-                                        <TableRow key={headerGroup.id}>
-                                            {headerGroup.headers.map((header) => {
-                                                return (
-                                                    <TableHead key={header.id} colSpan={header.colSpan}>
-                                                        {header.isPlaceholder
-                                                            ? null
-                                                            : flexRender(header.column.columnDef.header, header.getContext())}
-                                                    </TableHead>
-                                                );
-                                            })}
-                                        </TableRow>
-                                    ))}
-                                </TableHeader>
-                                <TableBody>
-                                    {table.getRowModel().rows?.length ? (
-                                        table.getRowModel().rows.map((row) => (
-                                            <TableRow key={row.id}>
-                                                {row.getVisibleCells().map((cell) => (
-                                                    <TableCell key={cell.id} className="p-2 text-left whitespace-nowrap">
-                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                    </TableCell>
-                                                ))}
-                                            </TableRow>
-                                        ))
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell colSpan={columns.length} className="h-24 text-center">
-                                                No projects found.
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </div>
-                    ) : (
-                        <DataTableLoadingSpinner />
-                    )}
+                    {!isLoading && !isFetching ? <DataTableMain table={table} columns={columns} /> : <DataTableSkeleton rows={5} cols={5} />}
                 </div>
             </div>
         </div>

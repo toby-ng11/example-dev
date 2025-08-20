@@ -20,8 +20,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resources([
             'market-segments' => MarketSegmentController::class
         ]);
-
-        Route::get('/check-exist/projects', [MarketSegmentController::class, 'checkIfProjectExists']);
     });
 
     Route::resource('projects', ProjectController::class);
