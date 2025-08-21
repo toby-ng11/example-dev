@@ -18,7 +18,7 @@ class EnsureUserIsAdmin
         $user = $request->user();
 
         if (!$user || $user->p21User?->p2q_system_role !== 'admin') {
-            return redirect()->route('dashboard.home');
+            return redirect()->route('home');
         }
 
         return $next($request);

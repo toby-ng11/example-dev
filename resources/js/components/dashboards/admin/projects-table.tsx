@@ -228,7 +228,7 @@ export default function ProjectsTable() {
                                 onAddClick={() => console.log('Add clicked')}
                                 facetedFilters={[
                                     { columnId: 'owner_id', title: 'Owner' },
-                                    { columnId: 'shared_id', title: 'Shared' },
+                                    { columnId: 'shared_users', title: 'Shared' },
                                     { columnId: 'reed', title: 'REED' },
                                     { columnId: 'architect_name', title: 'Architect' },
                                     { columnId: 'market_segment_desc', title: 'Market Segment' },

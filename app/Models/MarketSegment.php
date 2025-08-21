@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MarketSegment extends Model
 {
+    /**
+     * @use HasFactory<\Database\Factories\MarketSegmentFactory>
+     */
     use HasFactory;
 
     public $timestamps = false;

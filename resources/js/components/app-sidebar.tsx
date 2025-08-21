@@ -1,22 +1,12 @@
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { Popover, PopoverTrigger } from '@/components/ui/popover';
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, Home, LayoutGrid, List, PlusCircle, ShieldCheck } from 'lucide-react';
+import { BookOpen, Folder, Home, LayoutGrid, List, ShieldCheck } from 'lucide-react';
 import AppLogo from './app-logo';
-import { Button } from './ui/button';
+import NavQuickCreateButton from './nav-quick-create-button';
 
 function getMainNavItems(userRole: string | null): NavItem[] {
     const base: NavItem[] = [
@@ -103,24 +93,8 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarGroup>
-                <SidebarMenu>
-                    <SidebarMenuItem key="Quick Create">
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <SidebarMenuButton asChild tooltip="Quick Create">
-                                    <Button type="button">
-                                        <PlusCircle />
-                                        Quick Create
-                                    </Button>
-                                </SidebarMenuButton>
-                            </PopoverTrigger>
-                        </Popover>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarGroup>
-
             <SidebarContent>
+                {userRole !== 'guest' && <NavQuickCreateButton />}
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 

@@ -29,7 +29,7 @@ interface MarketSegment {
 }
 
 export default function MarketSegmentTable() {
-    const [sorting, setSorting] = useState<SortingState>([{ id: 'id', desc: false }]);
+    const [sorting, setSorting] = useState<SortingState>([{ id: 'market_segment_desc', desc: false }]);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const [editedValue, setEditedValue] = useState<string>('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -43,7 +43,7 @@ export default function MarketSegmentTable() {
     const handleSave = async (rowId: number, editedValue: string) => {
         try {
             if (rowId === 0) {
-                const response = await axios.post('/market-segments', {
+                const response = await axios.post(ENDPOINT, {
                     market_segment_desc: editedValue,
                 });
 
@@ -54,7 +54,7 @@ export default function MarketSegmentTable() {
                     toast.error(`Error! Please check log for more detail.`);
                 }
             } else {
-                const { data } = await axios.put(`/market-segments/${rowId}`, {
+                const { data } = await axios.put(`${ENDPOINT}/${rowId}`, {
                     market_segment_desc: editedValue,
                 });
                 if (data) {
@@ -73,7 +73,7 @@ export default function MarketSegmentTable() {
     const handleDelete = async (rowId: number) => {
         if (!rowId) return;
         try {
-            const { data } = await axios.delete(`/market-segments/${rowId}`);
+            const { data } = await axios.delete(`${ENDPOINT}/${rowId}`);
             if (data.exists) {
                 toast.warning(`Cannot delete market segment #${rowId} — it still has projects.`);
                 return;
@@ -88,13 +88,6 @@ export default function MarketSegmentTable() {
     };
 
     const columns: ColumnDef<MarketSegment>[] = [
-        {
-            accessorKey: 'id',
-            header: ({ column }) => <DataTableColumnHeader column={column} title="ID" className="justify-center" />,
-            cell: ({ row }) => <div className="text-center">{row.getValue('id')}</div>,
-            enableHiding: false,
-            meta: 'ID',
-        },
         {
             accessorKey: 'market_segment_desc',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Market Segment" />,
@@ -221,21 +214,23 @@ export default function MarketSegmentTable() {
                             </div>
 
                             <DialogFooter>
-                                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                                     Cancel
                                 </Button>
                                 <Button
+                                    type="button"
+                                    disabled={!newSegmentDesc.trim()}
                                     onClick={async () => {
                                         if (!newSegmentDesc.trim()) return;
 
                                         try {
-                                            const response = await axios.post('/market-segments', {
+                                            const response = await axios.post(ENDPOINT, {
                                                 market_segment_desc: newSegmentDesc,
                                             });
 
                                             if (response.data) {
                                                 refetch();
-                                                toast.success(`Market segment added!`);
+                                                toast.success(`Added: ${response.data.market_segment_desc}`);
                                                 setNewSegmentDesc('');
                                                 setIsDialogOpen(false);
                                             }
