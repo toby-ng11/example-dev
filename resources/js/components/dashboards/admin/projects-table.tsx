@@ -6,6 +6,7 @@ import { DataTableSkeleton } from '@/components/table-skeleton';
 import { DataTableToolbar } from '@/components/table-toolbar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useTanStackQuery } from '@/hooks/use-query';
+import { Link } from '@inertiajs/react';
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -107,9 +108,9 @@ export default function ProjectsTable() {
                 const legacyId = row.original.legacy_id; // Make sure your data includes this field
                 const displayId = id <= 500 ? legacyId : id;
                 return (
-                    <a href={`/project/${id}/edit`} className="text-blue-500 dark:text-blue-300">
+                    <Link href={`${route('projects.edit', id)}?from=admin`} className="text-blue-500 dark:text-blue-300">
                         {displayId}
-                    </a>
+                    </Link>
                 );
             },
             enableHiding: false,

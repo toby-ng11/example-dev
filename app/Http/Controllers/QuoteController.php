@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\Architect;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class ArchitectController extends Controller
+class QuoteController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Inertia::render('architects/dashboard');
+        return Inertia::render('quotes/dashboard');
     }
 
     /**

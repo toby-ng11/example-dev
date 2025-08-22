@@ -6,6 +6,7 @@ import { DataTableSkeleton } from '@/components/table-skeleton';
 import { DataTableToolbar } from '@/components/table-toolbar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useTanStackQuery } from '@/hooks/use-query';
+import { Link } from '@inertiajs/react';
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -101,9 +102,9 @@ export default function QuotesTable() {
             cell: ({ row }) => {
                 const id = row.getValue<number>('id');
                 return (
-                    <a href={`/quote/${id}/edit`} className="text-blue-500 dark:text-blue-300">
+                    <Link href={`/quotes/${id}/edit`} className="text-blue-500 dark:text-blue-300">
                         {id}
-                    </a>
+                    </Link>
                 );
             },
             enableHiding: false,

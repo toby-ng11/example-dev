@@ -28,6 +28,7 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    project: Project;
     [key: string]: unknown;
 }
 
@@ -40,4 +41,20 @@ export interface User {
     p2q_system_role: string;
     default_company: string;
     default_location_id: string;
+}
+
+export interface Project {
+    id: string;
+    legacy_id: string;
+    project_id_ext: string;
+    project_name: string;
+    owner_id: string;
+    shared_users: string;
+    reed: string;
+    created_at: string;
+    due_date: string;
+    architect_name: string;
+    market_segment_desc: string;
+    status_desc: string;
+    [key: string]: unknown;
 }

@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\Architect\ArchitectController;
+use App\Http\Controllers\ArchitectController;
 use App\Http\Controllers\MarketSegmentController;
-use App\Http\Controllers\Project\ProjectController;
-use App\Http\Controllers\Quote\QuoteController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\RoleOverrideController;
 use App\Http\Controllers\StatusController;
 use Illuminate\Support\Facades\Route;
