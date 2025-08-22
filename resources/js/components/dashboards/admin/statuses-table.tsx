@@ -1,19 +1,17 @@
 import { DataTableColumnHeader } from '@/components/table-header';
 import DataTableMain from '@/components/table-main';
+import DataTableRowEditingButtons from '@/components/table-row-editing-buttons';
 import DataTableRowOptions from '@/components/table-row-options';
 import { DataTableSkeleton } from '@/components/table-skeleton';
-import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useTanStackQuery } from '@/hooks/use-query';
-import { useForm } from '@inertiajs/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { ColumnDef, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from '@tanstack/react-table';
 import axios from 'axios';
-import { LoaderCircle, Plus, Save, X } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
+import StatusesTableAddButton from './statuses-table-add-button';
 
 interface Status {
     id: number;
@@ -22,48 +20,33 @@ interface Status {
     quote_flag: 'Y' | 'N' | null;
 }
 
-type StatusForm = {
-    status_desc: string;
-    project_flag: string;
-    quote_flag: string;
-};
-
 export default function StatusesTable() {
+    const queryClient = useQueryClient();
     const [sorting, setSorting] = useState<SortingState>([{ id: 'status_desc', desc: false }]);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const [editedValue, setEditedValue] = useState<string>('');
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const [loading, setLoading] = useState(false);
 
     const ENDPOINT = '/statuses';
     const qKey = ['admin', 'statuses'];
 
-    const { data: statuses = [], isLoading, isFetching, refetch } = useTanStackQuery<Status>(ENDPOINT, qKey);
+    const { data: statuses = [], isLoading, isFetching } = useTanStackQuery<Status>(ENDPOINT, qKey);
 
-    const handleSave = async (rowId: number, editedValue: string) => {
+    const handleEdit = async (rowId: number, editedValue: string) => {
         try {
-            if (rowId === 0) {
-                const response = await axios.post(ENDPOINT, {
-                    status_desc: editedValue,
-                });
-
-                if (response.data) {
-                    refetch();
-                    toast.success(`Saved: ${editedValue}.`);
-                } else {
-                    toast.error(`Error! Please check log for more detail.`);
-                }
-            } else {
-                const { data } = await axios.put(`${ENDPOINT}/${rowId}`, {
-                    status_desc: editedValue,
-                });
-                if (data) {
-                    setEditingRowId(null);
-                    setEditedValue('');
-                    toast.success(data.message);
-                    refetch();
-                }
+            const { data } = await axios.put(`${ENDPOINT}/${rowId}`, {
+                status_desc: editedValue,
+            });
+            if (data) {
+                await Promise.all([
+                    queryClient.invalidateQueries({ queryKey: qKey }),
+                    queryClient.invalidateQueries({ queryKey: ['admin', 'projects'] }),
+                    queryClient.invalidateQueries({ queryKey: ['admin', 'quotes'] }),
+                ]);
+                setEditingRowId(null);
+                setEditedValue('');
+                toast.success(data.message);
             }
         } catch (err) {
             console.error(err);
@@ -79,7 +62,7 @@ export default function StatusesTable() {
                 toast.warning(`Cannot delete market segment #${rowId} — it still has projects.`);
                 return;
             }
-            refetch();
+            await queryClient.invalidateQueries({ queryKey: qKey });
             toast.success(data.message);
             return true;
         } catch (error) {
@@ -98,8 +81,8 @@ export default function StatusesTable() {
             const { success, message } = response.data;
 
             if (success) {
+                await queryClient.invalidateQueries({ queryKey: qKey });
                 toast.success(message || 'Updated');
-                refetch();
             } else {
                 toast.warning(message || 'Update blocked by validation');
             }
@@ -130,7 +113,7 @@ export default function StatusesTable() {
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     e.preventDefault();
-                                    handleSave(rowId, editedValue);
+                                    handleEdit(rowId, editedValue);
                                 } else if (e.key === 'Escape') {
                                     setEditingRowId(null);
                                     setEditedValue('');
@@ -192,27 +175,13 @@ export default function StatusesTable() {
 
                 if (isEditing) {
                     return (
-                        <div className="flex items-center gap-2">
-                            <Button
-                                size="icon"
-                                variant="outline"
-                                className="size-8 text-green-600 hover:text-green-800"
-                                onClick={() => handleSave(rowId, editedValue)}
-                            >
-                                <Save />
-                            </Button>
-                            <Button
-                                size="icon"
-                                variant="outline"
-                                className="size-8 text-red-600 hover:text-red-800"
-                                onClick={() => {
-                                    setEditingRowId(null);
-                                    setEditedValue('');
-                                }}
-                            >
-                                <X />
-                            </Button>
-                        </div>
+                        <DataTableRowEditingButtons
+                            saveEdit={() => handleEdit(rowId, editedValue)}
+                            cancel={() => {
+                                setEditingRowId(null);
+                                setEditedValue('');
+                            }}
+                        />
                     );
                 } else {
                     return (
@@ -244,97 +213,10 @@ export default function StatusesTable() {
         },
     });
 
-    const { data, setData, post, processing, reset } = useForm<StatusForm>({
-        status_desc: '',
-        project_flag: '',
-        quote_flag: '',
-    });
-
-    const submit: FormEventHandler = async (e) => {
-        e.preventDefault();
-        post(ENDPOINT, {
-            onSuccess: () => {
-                toast.success('Added successfully');
-                setIsDialogOpen(false);
-                reset();
-                refetch();
-            },
-            onError: (errors) => {
-                toast.error(`Error saving: ${errors}`);
-            },
-        });
-    };
-
     return (
         <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
             <div className="flex flex-1 flex-col gap-4 p-2">
-                <div className="absolute top-4 right-4 z-10">
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button title="Add new status" variant="outline" className="size-8">
-                                <Plus className="h-4 w-4" />
-                            </Button>
-                        </DialogTrigger>
-
-                        <DialogContent className='sm:max-w-100'>
-                            <DialogHeader>
-                                <DialogTitle>Add Status</DialogTitle>
-                                <DialogDescription>Enter a new status description, then choose at least a flag and click Save.</DialogDescription>
-                            </DialogHeader>
-                            <form className="flex flex-col gap-6" onSubmit={submit}>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="status_desc">Status</Label>
-                                    <Input
-                                        id="status_desc"
-                                        value={data.status_desc}
-                                        onChange={(e) => setData('status_desc', e.target.value)}
-                                        placeholder="e.g. Not completed, ..."
-                                        autoFocus
-                                        required
-                                    />
-                                </div>
-
-                                <div className="flex items-start gap-3">
-                                    <Checkbox
-                                        id="project_flag"
-                                        checked={data.project_flag === 'Y'}
-                                        onCheckedChange={(checked) => setData('project_flag', checked ? 'Y' : 'N')}
-                                    />
-                                    <Label htmlFor="project_flag">Project Flag</Label>
-                                </div>
-
-                                <div className="flex items-start gap-3">
-                                    <Checkbox
-                                        id="quote_flag"
-                                        checked={data.quote_flag === 'Y'}
-                                        onCheckedChange={(checked) => setData('quote_flag', checked ? 'Y' : 'N')}
-                                    />
-                                    <Label htmlFor="quote_flag">Quote Flag</Label>
-                                </div>
-
-                                <DialogFooter>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => {
-                                            setIsDialogOpen(false);
-                                            reset();
-                                        }}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        type="submit"
-                                        disabled={processing || !data.status_desc.trim() || (!data.project_flag && !data.quote_flag)}
-                                    >
-                                        Save
-                                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                    </Button>
-                                </DialogFooter>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
-                </div>
+                <StatusesTableAddButton endpoint={ENDPOINT} queryKey={qKey} />
 
                 <div className="flex flex-col gap-1">
                     <h2 className="text-2xl font-semibold tracking-tight">Worksheet Statuses</h2>

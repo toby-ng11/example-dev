@@ -1,12 +1,11 @@
 import { DataTableColumnHeader } from '@/components/table-header';
 import DataTableMain from '@/components/table-main';
+import DataTableRowEditingButtons from '@/components/table-row-editing-buttons';
 import DataTableRowOptions from '@/components/table-row-options';
 import { DataTableSkeleton } from '@/components/table-skeleton';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useTanStackQuery } from '@/hooks/use-query';
+import { useQueryClient } from '@tanstack/react-query';
 import {
     ColumnDef,
     getCoreRowModel,
@@ -19,9 +18,9 @@ import {
     useReactTable,
 } from '@tanstack/react-table';
 import axios from 'axios';
-import { Plus, Save, X } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import MarketSegmentTableAddButton from './market-segments-add-button';
 
 interface MarketSegment {
     id: number;
@@ -29,40 +28,26 @@ interface MarketSegment {
 }
 
 export default function MarketSegmentTable() {
+    const queryClient = useQueryClient();
     const [sorting, setSorting] = useState<SortingState>([{ id: 'market_segment_desc', desc: false }]);
     const [editingRowId, setEditingRowId] = useState<number | null>(null);
     const [editedValue, setEditedValue] = useState<string>('');
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [newSegmentDesc, setNewSegmentDesc] = useState('');
 
     const ENDPOINT = '/market-segments';
     const qKey = ['admin', 'market-segments'];
 
-    const { data: marketSegments = [], isLoading, isFetching, refetch } = useTanStackQuery<MarketSegment>(ENDPOINT, qKey);
+    const { data: marketSegments = [], isLoading, isFetching } = useTanStackQuery<MarketSegment>(ENDPOINT, qKey);
 
-    const handleSave = async (rowId: number, editedValue: string) => {
+    const handleEdit = async (rowId: number, editedValue: string) => {
         try {
-            if (rowId === 0) {
-                const response = await axios.post(ENDPOINT, {
-                    market_segment_desc: editedValue,
-                });
-
-                if (response.data) {
-                    refetch();
-                    toast.success(`Saved: ${editedValue}.`);
-                } else {
-                    toast.error(`Error! Please check log for more detail.`);
-                }
-            } else {
-                const { data } = await axios.put(`${ENDPOINT}/${rowId}`, {
-                    market_segment_desc: editedValue,
-                });
-                if (data) {
-                    setEditingRowId(null);
-                    setEditedValue('');
-                    toast.success(data.message);
-                    refetch();
-                }
+            const { data } = await axios.put(`${ENDPOINT}/${rowId}`, {
+                market_segment_desc: editedValue,
+            });
+            if (data) {
+                await queryClient.invalidateQueries({ queryKey: qKey });
+                setEditingRowId(null);
+                setEditedValue('');
+                toast.success(data.message);
             }
         } catch (err) {
             console.error(err);
@@ -78,7 +63,7 @@ export default function MarketSegmentTable() {
                 toast.warning(`Cannot delete market segment #${rowId} — it still has projects.`);
                 return;
             }
-            refetch();
+            await queryClient.invalidateQueries({ queryKey: qKey });
             toast.success(data.message);
             return true;
         } catch (error) {
@@ -107,7 +92,7 @@ export default function MarketSegmentTable() {
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     e.preventDefault();
-                                    handleSave(rowId, editedValue);
+                                    handleEdit(rowId, editedValue);
                                 } else if (e.key === 'Escape') {
                                     setEditingRowId(null);
                                     setEditedValue('');
@@ -129,27 +114,13 @@ export default function MarketSegmentTable() {
 
                 if (isEditing) {
                     return (
-                        <div className="flex items-center gap-2">
-                            <Button
-                                size="icon"
-                                variant="outline"
-                                className="size-8 text-green-600 hover:text-green-800"
-                                onClick={() => handleSave(rowId, editedValue)}
-                            >
-                                <Save />
-                            </Button>
-                            <Button
-                                size="icon"
-                                variant="outline"
-                                className="size-8 text-red-600 hover:text-red-800"
-                                onClick={() => {
-                                    setEditingRowId(null);
-                                    setEditedValue('');
-                                }}
-                            >
-                                <X />
-                            </Button>
-                        </div>
+                        <DataTableRowEditingButtons
+                            saveEdit={() => handleEdit(rowId, editedValue)}
+                            cancel={() => {
+                                setEditingRowId(null);
+                                setEditedValue('');
+                            }}
+                        />
                     );
                 } else {
                     return (
@@ -188,64 +159,7 @@ export default function MarketSegmentTable() {
     return (
         <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
             <div className="flex flex-1 flex-col gap-4 p-2">
-                <div className="absolute top-4 right-4 z-10">
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button title="Add new market segment" variant="outline" className="size-8">
-                                <Plus className="h-4 w-4" />
-                            </Button>
-                        </DialogTrigger>
-
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Add Market Segment</DialogTitle>
-                                <DialogDescription>Enter a new market segment description and click Save.</DialogDescription>
-                            </DialogHeader>
-
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="desc">Market Segment</Label>
-                                <Input
-                                    id="desc"
-                                    value={newSegmentDesc}
-                                    onChange={(e) => setNewSegmentDesc(e.target.value)}
-                                    placeholder="e.g. Retail, Hospitality..."
-                                    autoFocus
-                                />
-                            </div>
-
-                            <DialogFooter>
-                                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                                    Cancel
-                                </Button>
-                                <Button
-                                    type="button"
-                                    disabled={!newSegmentDesc.trim()}
-                                    onClick={async () => {
-                                        if (!newSegmentDesc.trim()) return;
-
-                                        try {
-                                            const response = await axios.post(ENDPOINT, {
-                                                market_segment_desc: newSegmentDesc,
-                                            });
-
-                                            if (response.data) {
-                                                refetch();
-                                                toast.success(`Added: ${response.data.market_segment_desc}`);
-                                                setNewSegmentDesc('');
-                                                setIsDialogOpen(false);
-                                            }
-                                        } catch (err) {
-                                            toast.error('Failed to add segment.');
-                                            console.error(err);
-                                        }
-                                    }}
-                                >
-                                    Save
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </div>
+                <MarketSegmentTableAddButton endpoint={ENDPOINT} queryKey={qKey} />
 
                 <div className="flex flex-col gap-1">
                     <h2 className="text-2xl font-semibold tracking-tight">Market Segments</h2>

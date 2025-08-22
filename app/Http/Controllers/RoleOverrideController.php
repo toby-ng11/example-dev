@@ -34,12 +34,16 @@ class RoleOverrideController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        if (RoleOverride::where('user_id', $request->user_id)->exists()) {
+            return redirect()->back()->withErrors(['error' => 'User already exists in table.']);
+        }
+
         $roleOverride = new RoleOverride();
         $roleOverride['user_id'] = $request->user_id;
         $roleOverride['override_role'] = $request->override_role;
         $roleOverride->save();
 
-        return redirect()->back()->with('success', 'Added successfully');
+        return redirect()->back();
     }
 
     /**
@@ -63,7 +67,11 @@ class RoleOverrideController extends Controller
      */
     public function update(Request $request, RoleOverride $roleOverride)
     {
-        //
+        $roleOverride->update($request->only('user_id', 'override_role'));
+        return response()->json([
+            'success' => true,
+            'message' => 'Updated!'
+        ]);
     }
 
     /**
