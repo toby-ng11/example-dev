@@ -49,7 +49,7 @@ class ProjectController extends Controller
      */
     public function edit(Project $project): Response
     {
-        return Inertia::render('project', ['project' => $project]);
+        return Inertia::render('projects/edit/page', ['project' => $project]);
     }
 
     /**

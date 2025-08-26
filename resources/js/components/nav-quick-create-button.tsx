@@ -1,9 +1,11 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 import { PlusCircle } from 'lucide-react';
+import { useGlobalDialogs } from './dialogs/dialog-context';
 
 export default function NavQuickCreateButton() {
     const { isMobile } = useSidebar();
+    const { open } = useGlobalDialogs();
 
     return (
         <SidebarGroup>
@@ -21,7 +23,7 @@ export default function NavQuickCreateButton() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent side={isMobile ? 'bottom' : 'right'} align={isMobile ? 'end' : 'start'} className="w-56">
                             <DropdownMenuItem>Opportunity</DropdownMenuItem>
-                            <DropdownMenuItem>Project</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => open('createProject')}>Project</DropdownMenuItem>
                             <DropdownMenuItem>Quote</DropdownMenuItem>
                             <DropdownMenuItem>Architect</DropdownMenuItem>
                         </DropdownMenuContent>
