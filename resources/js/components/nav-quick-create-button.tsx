@@ -1,4 +1,4 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 import { PlusCircle } from 'lucide-react';
 import { useGlobalDialogs } from './dialogs/dialog-context';
@@ -22,10 +22,22 @@ export default function NavQuickCreateButton() {
                             </SidebarMenuButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent side={isMobile ? 'bottom' : 'right'} align={isMobile ? 'end' : 'start'} className="w-56">
-                            <DropdownMenuItem>Opportunity</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => open('createProject')}>Project</DropdownMenuItem>
-                            <DropdownMenuItem>Quote</DropdownMenuItem>
-                            <DropdownMenuItem>Architect</DropdownMenuItem>
+                            <DropdownMenuItem>
+                                Opportunity
+                                <DropdownMenuShortcut>Ctrl+Shift+O</DropdownMenuShortcut>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => open('createProject')}>
+                                Project
+                                <DropdownMenuShortcut>Ctrl+Shift+P</DropdownMenuShortcut>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                Quote
+                                <DropdownMenuShortcut>Ctrl+Shift+Q</DropdownMenuShortcut>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                Architect
+                                <DropdownMenuShortcut>Ctrl+Shift+A</DropdownMenuShortcut>
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </SidebarMenuItem>

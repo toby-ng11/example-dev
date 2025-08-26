@@ -2,22 +2,59 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTanStackQuery } from '@/hooks/use-query';
+import { SharedData } from '@/types';
+import { useForm, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface ProjectFormProps {
     id: string;
     isCreating?: boolean;
-    isEditing?: boolean;
+}
+
+interface Branches {
+    location_id: string;
+    branch_description: string;
+}
+
+interface Project {
+    project_name: string;
+    project_address: string;
+    location_id: string;
+    status_id: string;
+    market_segment_id: string;
+    due_date: string;
+    require_date: string;
 }
 
 export default function ProjectForm({ id }: ProjectFormProps) {
+    const { user } = usePage<SharedData>().props.auth;
+    const branches = useTanStackQuery<Branches>('/lapi/branches', ['branches']);
+
+    const form = useForm<Project>({
+        project_name: '',
+        project_address: '',
+        location_id: '',
+        status_id: '',
+        market_segment_id: '',
+        due_date: '',
+        require_date: '',
+    });
+
     return (
         <form id={id}>
             <div className="flex max-h-[500px] flex-col gap-6 overflow-y-auto p-4">
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 xl:gap-6">
                     <div className="grid gap-2">
                         <Label htmlFor="project_name">Name</Label>
-                        <Input id="project_name" autoFocus required />
+                        <Input
+                            id="project_name"
+                            value={form.data.project_name}
+                            onChange={(e) => form.setData('project_name', e.target.value)}
+                            autoFocus
+                            required
+                        />
                     </div>
 
                     <div className="grid gap-2">
@@ -27,7 +64,16 @@ export default function ProjectForm({ id }: ProjectFormProps) {
 
                     <div className="grid gap-2">
                         <Label htmlFor="location_id">Branch</Label>
-                        <Input id="location_id" required />
+                        <Select value={user.default_location_id}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a branches..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {branches.data?.map((branch) => (
+                                    <SelectItem value={branch.location_id}>{branch.branch_description}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="grid gap-2">
