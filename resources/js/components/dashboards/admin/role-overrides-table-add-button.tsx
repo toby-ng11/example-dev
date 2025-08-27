@@ -1,4 +1,4 @@
-import { AutoComplete } from '@/components/auto-complete';
+import { AutoCompleteInput } from '@/components/auto-complete';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -10,7 +10,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { User } from '@/types';
@@ -79,8 +78,7 @@ export default function RoleOverrideAddButton({ endpoint, queryKey }: RoleOverri
                         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="user_id">User ID</Label>
-                                <Input id="user_id" type="hidden" value={data.user_id} required readOnly />
-                                <AutoComplete<User>
+                                <AutoCompleteInput<User>
                                     fetchUrl="/lapi/users"
                                     placeholder="Search for a user..."
                                     minLength={2}
@@ -93,8 +91,9 @@ export default function RoleOverrideAddButton({ endpoint, queryKey }: RoleOverri
                                             <span className="text-muted-foreground text-sm">{item.name}</span>
                                         </div>
                                     )}
+                                    inputId="user_id"
                                     inputValue={data.user_id}
-                                    onInputValueChange={(e) => setData('user_id', e)}
+                                    onInputValueChange={(val) => setData('user_id', val)}
                                     onSelect={(item) => {
                                         setData('user_id', item.id);
                                         setData('override_role', item.p2q_system_role);

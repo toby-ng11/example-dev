@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Search } from 'lucide-react';
 import { Key, ReactNode, useEffect, useState } from 'react';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
 
 type RenderFn<T> = (item: T) => ReactNode;
 
@@ -29,6 +30,9 @@ export type AutoCompleteProps<T> = {
     limit?: number; // default 10
     debounceMs?: number; // default 300
 
+    inputId?: string;
+    inputName?: string;
+
     /** Controlled input (optional) */
     inputValue?: string;
     onInputValueChange?: (value: string) => void;
@@ -37,7 +41,7 @@ export type AutoCompleteProps<T> = {
     extraParams?: Record<string, string | number | boolean | undefined>;
 };
 
-export function AutoComplete<T>({
+export function AutoCompleteInput<T>({
     fetchUrl,
     onSelect,
     renderItem,
@@ -49,6 +53,8 @@ export function AutoComplete<T>({
     limitParamName = 'limit',
     limit = 10,
     debounceMs = 300,
+    inputId,
+    inputName,
     inputValue,
     onInputValueChange,
     extraParams,
@@ -135,53 +141,56 @@ export function AutoComplete<T>({
     };
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
-                    className={cn('justify-between', className)}
-                    role="combobox"
-                    aria-expanded={open}
-                    aria-autocomplete="list"
-                >
-                    {value === '' ? placeholder : value}
-                    <Search className="opacity-50" />
-                </Button>
-            </PopoverTrigger>
+        <>
+            <Input id={inputId} name={inputName ?? inputId} type="hidden" value={inputValue} required readOnly />
+            <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                    <Button
+                        variant="outline"
+                        className={cn('justify-between', className)}
+                        role="combobox"
+                        aria-expanded={open}
+                        aria-autocomplete="list"
+                    >
+                        {value === '' ? placeholder : value}
+                        <Search className="opacity-50" />
+                    </Button>
+                </PopoverTrigger>
 
-            <PopoverContent className="p-0">
-                <Command shouldFilter={false}>
-                    <CommandInput
-                        placeholder={placeholder}
-                        value={value}
-                        onValueChange={(v) => handleInputChange(v)}
-                        // show spinner when loading
-                    />
-                    <CommandList>
-                        {loading && <div className="text-muted-foreground py-3 text-center text-sm">Searching…</div>}
+                <PopoverContent className="p-0">
+                    <Command shouldFilter={false}>
+                        <CommandInput
+                            placeholder={placeholder}
+                            value={value}
+                            onValueChange={(v) => handleInputChange(v)}
+                            // show spinner when loading
+                        />
+                        <CommandList>
+                            {loading && <div className="text-muted-foreground py-3 text-center text-sm">Searching…</div>}
 
-                        {!loading && error && <div className="text-destructive py-3 text-center text-sm">{error}</div>}
+                            {!loading && error && <div className="text-destructive py-3 text-center text-sm">{error}</div>}
 
-                        {!loading && !error && (
-                            <>
-                                <CommandEmpty>No matches found.</CommandEmpty>
-                                <CommandGroup>
-                                    {items.map((item, idx) => (
-                                        <CommandItem
-                                            key={keyFor(item, idx)}
-                                            // cmdk gives full keyboard nav & aria
-                                            onSelect={() => selectItem(item)}
-                                        >
-                                            {(renderItem ?? defaultRenderItem)(item)}
-                                        </CommandItem>
-                                    ))}
-                                </CommandGroup>
-                            </>
-                        )}
-                    </CommandList>
-                </Command>
-            </PopoverContent>
-        </Popover>
+                            {!loading && !error && (
+                                <>
+                                    <CommandEmpty>No matches found.</CommandEmpty>
+                                    <CommandGroup>
+                                        {items.map((item, idx) => (
+                                            <CommandItem
+                                                key={keyFor(item, idx)}
+                                                // cmdk gives full keyboard nav & aria
+                                                onSelect={() => selectItem(item)}
+                                            >
+                                                {(renderItem ?? defaultRenderItem)(item)}
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </>
+                            )}
+                        </CommandList>
+                    </Command>
+                </PopoverContent>
+            </Popover>
+        </>
     );
 }
 

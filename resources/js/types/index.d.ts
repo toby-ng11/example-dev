@@ -43,6 +43,19 @@ export interface User {
     default_location_id: string;
 }
 
+export interface Companies {
+    company_id: string;
+    company_name: string;
+}
+
+export interface Branches {
+    company_id: string;
+    location_id: string;
+    default_branch_id: string;
+    branch_description: string;
+    company_name: string;
+}
+
 export interface Status {
     id: string;
     status_desc: string;
@@ -53,6 +66,16 @@ export interface Status {
 export interface MarketSegment {
     id: string;
     market_segment_desc: string;
+}
+
+export interface Architect {
+    id: string;
+    architect_name: string;
+    architect_rep_id: string;
+    company_id: string;
+    architect_type_id: string;
+    class_id: string;
+    [key: string]: unknown;
 }
 
 export interface Project {

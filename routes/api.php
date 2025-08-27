@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArchitectController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MarketSegmentController;
 use App\Http\Controllers\PreferenceController;
@@ -20,6 +21,7 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         'users' => UserController::class,
         'branches' => LocationController::class,
         'market-segments' => MarketSegmentController::class,
+        'architects' => ArchitectController::class,
         'statuses' => StatusController::class,
     ]);
 });

@@ -57,7 +57,7 @@ class Project extends Model
         return $this->belongsTo(Architect::class);
     }
 
-    public function architectAddress()
+    public function architectAddress(): BelongsTo
     {
         return $this->belongsTo(Address::class, 'architect_address_id');
     }

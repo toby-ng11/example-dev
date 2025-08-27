@@ -11,10 +11,23 @@ class LocationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $locations = P21LocationxBranch::orderBy('location_id')->get();
-        return response()->json($locations->toArray());
+        $query = P21LocationxBranch::query();
+
+        if ($request->has('type')) {
+            if ($request->get('type') === 'companies') {
+                $result = $query->select(['company_id', 'company_name'])
+                    ->distinct()
+                    ->orderBy('company_id')
+                    ->get();
+                return response()->json($result);
+            }
+        }
+
+        $result = $query->orderBy('location_id')->get();
+
+        return response()->json($result);
     }
 
     /**

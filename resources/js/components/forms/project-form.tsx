@@ -4,9 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTanStackQuery } from '@/hooks/use-query';
-import { type MarketSegment, SharedData, type Status } from '@/types';
-import { Form, usePage } from '@inertiajs/react';
+import { type Architect, type Branches, Companies, type MarketSegment, SharedData, type Status } from '@/types';
+import { useForm, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
+import { AutoCompleteInput } from '../auto-complete';
 import FormDatePicker from '../form-datepicker';
 
 interface ProjectFormProps {
@@ -14,34 +15,71 @@ interface ProjectFormProps {
     isCreating?: boolean;
 }
 
-interface Branches {
+interface Project {
+    project_name: string;
+    project_address: string;
     location_id: string;
-    branch_description: string;
+    status_id: string | undefined;
+    market_segment_id: string | undefined;
+    due_date: Date | undefined;
+    require_date: Date | undefined;
+    architect_id: string;
+    architect_name: string;
+    architect_rep_id: string;
+    architect_company_id: string;
+    architect_class_id: string;
 }
 
 export default function ProjectForm({ id }: ProjectFormProps) {
     const { user } = usePage<SharedData>().props.auth;
     const branches = useTanStackQuery<Branches>('/lapi/branches', ['branches']);
+    const companies = useTanStackQuery<Companies>('/lapi/branches?type=companies', ['companies']);
     const statuses = useTanStackQuery<Status>('/lapi/statuses?type=project', ['project-statuses']);
     const marketSegments = useTanStackQuery<MarketSegment>('/lapi/market-segments', ['market-segments']);
 
+    const form = useForm<Project>({
+        project_name: '',
+        project_address: '',
+        location_id: user.default_location_id ?? undefined,
+        status_id: '',
+        market_segment_id: '',
+        due_date: undefined,
+        require_date: undefined,
+        architect_id: '',
+        architect_name: '',
+        architect_company_id: '',
+        architect_class_id: '',
+        architect_rep_id: '',
+    });
+
     return (
-        <Form id={id} action="/projects" method="post">
+        <form id={id}>
             <div className="flex max-h-[500px] flex-col gap-6 overflow-y-auto p-4">
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 xl:gap-6">
                     <div className="grid gap-2">
                         <Label htmlFor="project_name">Name</Label>
-                        <Input id="project_name" name="project_name" autoFocus required />
+                        <Input
+                            id="project_name"
+                            value={form.data.project_name}
+                            onChange={(e) => form.setData('project_name', e.target.value)}
+                            autoFocus
+                            required
+                        />
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="project_address">Location</Label>
-                        <Input id="project_address" name="project_address" required />
+                        <Input
+                            id="project_address"
+                            value={form.data.project_address}
+                            onChange={(e) => form.setData('project_address', e.target.value)}
+                            required
+                        />
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="location_id">Branch</Label>
-                        <Select name="location_id" defaultValue={user.default_location_id}>
+                        <Select value={form.data.location_id} onValueChange={(val) => form.setData('location_id', val)}>
                             <SelectTrigger id="location_id">
                                 <SelectValue placeholder="Select a branch..." />
                             </SelectTrigger>
@@ -57,7 +95,7 @@ export default function ProjectForm({ id }: ProjectFormProps) {
 
                     <div className="grid gap-2">
                         <Label htmlFor="status_id">Status</Label>
-                        <Select name="status_id">
+                        <Select value={form.data.status_id} onValueChange={(val) => form.setData('status_id', val)}>
                             <SelectTrigger id="status_id">
                                 <SelectValue placeholder="Select a project status..." />
                             </SelectTrigger>
@@ -73,9 +111,9 @@ export default function ProjectForm({ id }: ProjectFormProps) {
 
                     <div className="grid gap-2">
                         <Label htmlFor="market_segment_id">Market Segment</Label>
-                        <Select name="market_segment_id">
+                        <Select value={form.data.market_segment_id} onValueChange={(val) => form.setData('market_segment_id', val)}>
                             <SelectTrigger id="market_segment_id">
-                                <SelectValue placeholder="Select a project segment..." />
+                                <SelectValue placeholder="Select a project status..." />
                             </SelectTrigger>
                             <SelectContent>
                                 {marketSegments.data?.map((marketSegment) => (
@@ -89,12 +127,12 @@ export default function ProjectForm({ id }: ProjectFormProps) {
 
                     <div className="grid gap-2">
                         <Label htmlFor="due_date">Tender Due Date</Label>
-                        <FormDatePicker id="due_date" />
+                        <FormDatePicker id="require_date" value={form.data.due_date} onChange={(d) => form.setData('due_date', d)} />
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="require_date">Required Date</Label>
-                        <FormDatePicker id="require_date" />
+                        <FormDatePicker id="require_date" value={form.data.require_date} onChange={(d) => form.setData('require_date', d)} />
                     </div>
                 </div>
 
@@ -109,26 +147,72 @@ export default function ProjectForm({ id }: ProjectFormProps) {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                         <div className="grid grid-cols-1 gap-4 pt-4 lg:grid-cols-2 xl:grid-cols-3 xl:gap-6">
-                            <Input name="architect_id" type="hidden" />
+                            <Input value={form.data.architect_id} onChange={(e) => form.setData('architect_id', e.target.value)} type="hidden" />
 
                             <div className="grid gap-2">
                                 <Label htmlFor="architect_name">Architect Name</Label>
-                                <Input id="architect_name" />
+                                <AutoCompleteInput<Architect>
+                                    fetchUrl="/lapi/architects"
+                                    placeholder="Search for an architect..."
+                                    minLength={2}
+                                    queryParamName="pattern"
+                                    limitParamName="limit"
+                                    limit={10}
+                                    renderItem={(item) => (
+                                        <div className="flex flex-col">
+                                            <strong>{item.architect_name}</strong>
+                                            <span className="text-muted-foreground text-sm">
+                                                {item.architect_rep_id} - {item.company_id}
+                                            </span>
+                                        </div>
+                                    )}
+                                    inputId="architect_name"
+                                    inputValue={form.data.architect_name}
+                                    onInputValueChange={(val) => form.setData('architect_name', val)}
+                                    onSelect={(item) => {
+                                        form.setData('architect_name', item.architect_name);
+                                        form.setData('architect_id', item.id);
+                                        form.setData('architect_company_id', item.company_id);
+                                        form.setData('architect_rep_id', item.architect_rep_id);
+                                        form.setData('architect_class_id', item.class_id);
+                                    }}
+                                />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="architect_company_id">Branch</Label>
-                                <Input id="architect_company_id" name="architect_company_id" />
+                                <Select value={form.data.architect_company_id} onValueChange={(val) => form.setData('architect_company_id', val)}>
+                                    <SelectTrigger id="architect_company_id">
+                                        <SelectValue placeholder="Select a branch..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {companies.data?.map((branch) => (
+                                            <SelectItem key={branch.company_id} value={branch.company_id}>
+                                                {branch.company_name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="architect_rep_id">Architect Rep.</Label>
-                                <Input id="architect_rep_id" name="architect_rep_id" />
+                                <Input
+                                    id="architect_rep_id"
+                                    value={form.data.architect_rep_id}
+                                    onChange={(e) => form.setData('architect_rep_id', e.target.value)}
+                                    required
+                                />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="architect_class_id">Class</Label>
-                                <Input id="architect_class_id" name="architect_class_id" />
+                                <Input
+                                    id="architect_class_id"
+                                    value={form.data.architect_class_id}
+                                    onChange={(e) => form.setData('architect_class_id', e.target.value)}
+                                    required
+                                />
                             </div>
                         </div>
 
@@ -274,6 +358,6 @@ export default function ProjectForm({ id }: ProjectFormProps) {
                     </CollapsibleContent>
                 </Collapsible>
             </div>
-        </Form>
+        </form>
     );
 }
