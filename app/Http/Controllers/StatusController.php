@@ -12,10 +12,17 @@ class StatusController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $statuses = Status::all();
-        return response()->json($statuses->toArray());
+        $query = Status::query();
+
+        if ($request->has('type')) {
+            $query->where($request->get('type') . '_flag', 'Y');
+        }
+
+        $statuses = $query->orderBy('status_desc')->get();
+
+        return response()->json($statuses);
     }
 
     /**

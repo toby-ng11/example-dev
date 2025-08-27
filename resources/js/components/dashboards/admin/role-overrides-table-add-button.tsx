@@ -1,3 +1,4 @@
+import { AutoComplete } from '@/components/auto-complete';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -12,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { User } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { LoaderCircle, Plus } from 'lucide-react';
@@ -74,23 +76,36 @@ export default function RoleOverrideAddButton({ endpoint, queryKey }: RoleOverri
                     </DialogHeader>
 
                     <form className="flex flex-col gap-6" onSubmit={submit}>
-                        <div className="flex flex-col gap-6 md:flex-row">
+                        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="user_id">User ID</Label>
-                                <Input
-                                    id="user_id"
-                                    value={data.user_id}
-                                    onChange={(e) => setData('user_id', e.target.value)}
+                                <Input id="user_id" type="hidden" value={data.user_id} required readOnly />
+                                <AutoComplete<User>
+                                    fetchUrl="/lapi/users"
                                     placeholder="Search for a user..."
-                                    autoFocus
-                                    required
+                                    minLength={2}
+                                    queryParamName="pattern"
+                                    limitParamName="limit"
+                                    limit={10}
+                                    renderItem={(item) => (
+                                        <div className="flex flex-col">
+                                            <strong>{item.name}</strong>
+                                            <span className="text-muted-foreground text-sm">{item.name}</span>
+                                        </div>
+                                    )}
+                                    inputValue={data.user_id}
+                                    onInputValueChange={(e) => setData('user_id', e)}
+                                    onSelect={(item) => {
+                                        setData('user_id', item.id);
+                                        setData('override_role', item.p2q_system_role);
+                                    }}
                                 />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="override_role">New Role</Label>
                                 <Select value={data.override_role} onValueChange={(val) => setData('override_role', val)}>
-                                    <SelectTrigger id="override_role" className="w-full md:w-[220px]">
+                                    <SelectTrigger id="override_role">
                                         <SelectValue placeholder="Select a role..." />
                                     </SelectTrigger>
                                     <SelectContent>

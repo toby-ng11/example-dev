@@ -16,10 +16,6 @@ class P21LocationxBranch extends Model
 
     public $timestamps = false;
 
-    protected $casts = [
-        'location_id' => 'integer',
-    ];
-
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class, 'centura_location_id', 'location_id');

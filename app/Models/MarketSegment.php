@@ -15,6 +15,10 @@ class MarketSegment extends Model
 
     public $timestamps = false;
 
+    protected $casts = [
+        'id' => 'string',
+    ];
+
     protected $fillable = ['market_segment_desc'];
 
     public function projects(): HasMany

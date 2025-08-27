@@ -21,6 +21,10 @@ class Status extends Model
         'quote_flag',
     ];
 
+    protected $casts = [
+        'id' => 'string',
+    ];
+
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class);

@@ -19,11 +19,13 @@ export default function CreateProjectDialog() {
 
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button form={formId} type="button" variant="outline">
+                        <Button type="button" variant="outline">
                             Cancel
                         </Button>
                     </DialogClose>
-                    <Button type="submit">Save</Button>
+                    <Button type="submit" form={formId}>
+                        Save
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
