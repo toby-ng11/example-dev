@@ -5,6 +5,7 @@ import DataTableRowOptions from '@/components/table-row-options';
 import { DataTableSkeleton } from '@/components/table-skeleton';
 import { Input } from '@/components/ui/input';
 import { useTanStackQuery } from '@/hooks/use-query';
+import { type MarketSegment } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 import {
     ColumnDef,
@@ -22,15 +23,10 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import MarketSegmentTableAddButton from './market-segments-add-button';
 
-interface MarketSegment {
-    id: number;
-    market_segment_desc: string;
-}
-
 export default function MarketSegmentTable() {
     const queryClient = useQueryClient();
     const [sorting, setSorting] = useState<SortingState>([{ id: 'market_segment_desc', desc: false }]);
-    const [editingRowId, setEditingRowId] = useState<number | null>(null);
+    const [editingRowId, setEditingRowId] = useState<string | null>(null);
     const [editedValue, setEditedValue] = useState<string>('');
 
     const ENDPOINT = '/market-segments';
@@ -38,7 +34,7 @@ export default function MarketSegmentTable() {
 
     const { data: marketSegments = [], isLoading, isFetching } = useTanStackQuery<MarketSegment>(ENDPOINT, qKey);
 
-    const handleEdit = async (rowId: number, editedValue: string) => {
+    const handleEdit = async (rowId: string, editedValue: string) => {
         try {
             const { data } = await axios.put(`${ENDPOINT}/${rowId}`, {
                 market_segment_desc: editedValue,
@@ -55,7 +51,7 @@ export default function MarketSegmentTable() {
         }
     };
 
-    const handleDelete = async (rowId: number) => {
+    const handleDelete = async (rowId: string) => {
         if (!rowId) return;
         try {
             const { data } = await axios.delete(`${ENDPOINT}/${rowId}`);

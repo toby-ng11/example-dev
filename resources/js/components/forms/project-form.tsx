@@ -3,9 +3,12 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTanStackQuery } from '@/hooks/use-query';
-import { SharedData } from '@/types';
+import { type MarketSegment, SharedData, type Status } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { ChevronDownIcon, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Calendar } from '../ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface ProjectFormProps {
@@ -24,13 +27,17 @@ interface Project {
     location_id: string;
     status_id: string;
     market_segment_id: string;
-    due_date: string;
-    require_date: string;
+    due_date: Date | undefined;
+    require_date: Date | undefined;
 }
 
 export default function ProjectForm({ id }: ProjectFormProps) {
     const { user } = usePage<SharedData>().props.auth;
     const branches = useTanStackQuery<Branches>('/lapi/branches', ['branches']);
+    const statuses = useTanStackQuery<Status>('/lapi/statuses', ['worksheet-statuses']);
+    const marketSegments = useTanStackQuery<MarketSegment>('/lapi/market-segments', ['market-segments']);
+
+    const [open, setOpen] = useState(false);
 
     const form = useForm<Project>({
         project_name: '',
@@ -38,8 +45,8 @@ export default function ProjectForm({ id }: ProjectFormProps) {
         location_id: '',
         status_id: '',
         market_segment_id: '',
-        due_date: '',
-        require_date: '',
+        due_date: new Date(),
+        require_date: new Date(),
     });
 
     return (
@@ -59,14 +66,19 @@ export default function ProjectForm({ id }: ProjectFormProps) {
 
                     <div className="grid gap-2">
                         <Label htmlFor="project_address">Location</Label>
-                        <Input id="project_address" required />
+                        <Input
+                            id="project_address"
+                            value={form.data.project_address}
+                            onChange={(e) => form.setData('project_address', e.target.value)}
+                            required
+                        />
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="location_id">Branch</Label>
-                        <Select value={user.default_location_id}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a branches..." />
+                        <Select value={user.default_location_id} onValueChange={(val) => form.setData('location_id', val)}>
+                            <SelectTrigger id="location_id">
+                                <SelectValue placeholder="Select a branch..." />
                             </SelectTrigger>
                             <SelectContent>
                                 {branches.data?.map((branch) => (
@@ -78,17 +90,53 @@ export default function ProjectForm({ id }: ProjectFormProps) {
 
                     <div className="grid gap-2">
                         <Label htmlFor="status_id">Status</Label>
-                        <Input id="status_id" required />
+                        <Select value={form.data.status_id} onValueChange={(val) => form.setData('status_id', val)}>
+                            <SelectTrigger id="status_id">
+                                <SelectValue placeholder="Select a project status..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {statuses.data?.map((status) => (
+                                    <SelectItem value={status.id}>{status.status_desc}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="market_segment_id">Market Segment</Label>
-                        <Input id="market_segment_id" required />
+                        <Select value={form.data.market_segment_id} onValueChange={(val) => form.setData('market_segment_id', val)}>
+                            <SelectTrigger id="market_segment_id">
+                                <SelectValue placeholder="Select a project status..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {marketSegments.data?.map((marketSegment) => (
+                                    <SelectItem value={marketSegment.id}>{marketSegment.market_segment_desc}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="due_date">Tender Due Date</Label>
-                        <Input id="due_date" />
+                        <Popover open={open} onOpenChange={setOpen}>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" id="due_date" className="justify-between font-normal">
+                                    {form.data.due_date ? form.data.due_date.toLocaleDateString() : 'Select date'}
+                                    <ChevronDownIcon />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={form.data.due_date}
+                                    captionLayout="dropdown"
+                                    onSelect={(date) => {
+                                        form.setData('due_date', date);
+                                        setOpen(false);
+                                    }}
+                                />
+                            </PopoverContent>
+                        </Popover>
                     </div>
 
                     <div className="grid gap-2">

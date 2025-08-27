@@ -6,6 +6,7 @@ import { DataTableSkeleton } from '@/components/table-skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { useTanStackQuery } from '@/hooks/use-query';
+import { type Status } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { ColumnDef, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from '@tanstack/react-table';
 import axios from 'axios';
@@ -13,17 +14,10 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import StatusesTableAddButton from './statuses-table-add-button';
 
-interface Status {
-    id: number;
-    status_desc: string;
-    project_flag: 'Y' | 'N' | null;
-    quote_flag: 'Y' | 'N' | null;
-}
-
 export default function StatusesTable() {
     const queryClient = useQueryClient();
     const [sorting, setSorting] = useState<SortingState>([{ id: 'status_desc', desc: false }]);
-    const [editingRowId, setEditingRowId] = useState<number | null>(null);
+    const [editingRowId, setEditingRowId] = useState<string | null>(null);
     const [editedValue, setEditedValue] = useState<string>('');
 
     const [loading, setLoading] = useState(false);
@@ -33,7 +27,7 @@ export default function StatusesTable() {
 
     const { data: statuses = [], isLoading, isFetching } = useTanStackQuery<Status>(ENDPOINT, qKey);
 
-    const handleEdit = async (rowId: number, editedValue: string) => {
+    const handleEdit = async (rowId: string, editedValue: string) => {
         try {
             const { data } = await axios.put(`${ENDPOINT}/${rowId}`, {
                 status_desc: editedValue,
@@ -54,7 +48,7 @@ export default function StatusesTable() {
         }
     };
 
-    const handleDelete = async (rowId: number) => {
+    const handleDelete = async (rowId: string) => {
         if (!rowId) return;
         try {
             const { data } = await axios.delete(`${ENDPOINT}/${rowId}`);
@@ -71,7 +65,7 @@ export default function StatusesTable() {
         }
     };
 
-    const handleToggle = async (rowId: number, flagName: 'project_flag' | 'quote_flag', newChecked: boolean) => {
+    const handleToggle = async (rowId: string, flagName: 'project_flag' | 'quote_flag', newChecked: boolean) => {
         setLoading(true);
         try {
             const response = await axios.put(`${ENDPOINT}/${rowId}`, {

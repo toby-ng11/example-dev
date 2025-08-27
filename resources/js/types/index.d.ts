@@ -43,6 +43,18 @@ export interface User {
     default_location_id: string;
 }
 
+export interface Status {
+    id: string;
+    status_desc: string;
+    project_flag: 'Y' | 'N' | null;
+    quote_flag: 'Y' | 'N' | null;
+}
+
+export interface MarketSegment {
+    id: string;
+    market_segment_desc: string;
+}
+
 export interface Project {
     id: string;
     legacy_id: string;
