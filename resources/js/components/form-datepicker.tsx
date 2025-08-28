@@ -9,10 +9,10 @@ interface FormDatePickerProps {
     className?: string;
     id: string;
     name?: string;
-    value?: Date;
+    value?: string | null;
     placeholder?: string;
     disabled?: boolean;
-    onChange: (date: Date | undefined) => void;
+    onChange: (date: string | null) => void;
     startMonth?: Date;
     endMonth?: Date;
     captionLayout?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years';
@@ -32,7 +32,7 @@ export default function FormDatePicker({
     className,
 }: FormDatePickerProps) {
     const [open, setOpen] = useState(false);
-    const display = value ? formatValue(value) : placeholder;
+    const display = value ? formatValue(new Date(value)) : placeholder;
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -52,12 +52,12 @@ export default function FormDatePicker({
             <PopoverContent className="w-auto overflow-hidden p-0" align="start">
                 <Calendar
                     mode="single"
-                    selected={value}
+                    selected={value ? new Date(value) : undefined}
                     captionLayout={captionLayout}
                     startMonth={startMonth}
                     endMonth={endMonth}
                     onSelect={(date) => {
-                        onChange(date);
+                        onChange(date ? date.toDateString().split('T')[0] : null);
                         setOpen(false);
                     }}
                 />

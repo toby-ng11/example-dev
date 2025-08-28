@@ -39,6 +39,7 @@ class ArchitectController extends Controller
         }
 
         $results = $query->where('architect_name', 'LIKE', '%' . $request->get('pattern') . '%')
+            ->orWhere('id', 'LIKE', '%' . $request->get('pattern') . '%')
             ->orderBy('architect_name')
             ->limit($limit)
             ->get();

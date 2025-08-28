@@ -41,6 +41,7 @@ export interface User {
     p2q_system_role: string;
     default_company: string;
     default_location_id: string;
+    email_verified_at?: string;
 }
 
 export interface Companies {
@@ -58,52 +59,68 @@ export interface Branches {
 
 export interface Status {
     id: string;
-    status_desc: string;
-    project_flag: 'Y' | 'N' | null;
-    quote_flag: 'Y' | 'N' | null;
+    status_desc?: string;
+    project_flag?: 'Y' | 'N' | null;
+    quote_flag?: 'Y' | 'N' | null;
 }
 
 export interface MarketSegment {
     id: string;
-    market_segment_desc: string;
+    market_segment_desc?: string;
 }
 
 export interface Architect {
     id: string;
-    architect_name: string;
-    architect_rep_id: string;
-    company_id: string;
-    architect_type_id: string;
-    class_id: string;
-    [key: string]: unknown;
+    architect_name?: string;
+    architect_rep_id?: string;
+    company_id?: string;
+    architect_type_id?: string;
+    class_id?: string;
+}
+
+export interface Specifier {
+    id: string;
+    first_name?: string;
+    last_name?: string;
+    job_title?: string;
+    architect_id?: string;
 }
 
 export interface Address {
     id: string;
-    name: string;
-    phys_address1: string;
-    phys_address2: string;
-    phys_city: string;
-    phys_state: string;
-    phys_postal_code: string;
-    phys_country: string;
-    central_phone_number: string;
-    email_address: string;
-    url: string;
+    name?: string;
+    phys_address1?: string;
+    phys_address2?: string;
+    phys_city?: string;
+    phys_state?: string;
+    phys_postal_code?: string;
+    phys_country?: string;
+    central_phone_number?: string;
+    email_address?: string;
+    url?: string;
+    addressable_id?: string;
+    addressable_type?: string;
 }
 
 export interface Project {
     id: string;
-    legacy_id: string;
-    project_id_ext: string;
-    project_name: string;
-    owner_id: string;
-    shared_users: string;
-    reed: string;
-    created_at: string;
-    due_date: string;
-    architect_name: string;
-    market_segment_desc: string;
-    status_desc: string;
-    [key: string]: unknown;
+    legacy_id?: string;
+    project_id_ext?: string;
+    project_name?: string;
+    project_address?: string;
+    centura_location_id?: string;
+    owner_id?: string;
+    shared_users?: string | null;
+    reed?: string | null;
+    general_contractor_id?: string | null;
+    awarded_contractor_id?: string | null;
+    created_at?: string | null;
+    due_date?: string | null;
+    required_date?: string | null;
+    status: Status;
+    market_segment: MarketSegment;
+    architect: Architect;
+    architect_address: Address;
+    specifier: Specifier;
+    specifier_address: Address;
 }

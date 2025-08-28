@@ -34,7 +34,7 @@ function FeatureCard({ href, title, description, index }: { href: string; title:
             className="bg-primary/10 h-35 w-100 max-w-md rounded-md border p-6 no-underline decoration-inherit shadow-md"
         >
             <Link href={href} prefetch>
-                <h2 className="mb-2 text-xl">{title}</h2>
+                <h2 className="mb-2 text-xl font-bold">{title}</h2>
                 <p className="text-sm">{description}</p>
             </Link>
         </motion.div>

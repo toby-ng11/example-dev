@@ -12,7 +12,7 @@ export default function ProjectPage() {
             href: '/dashboard/project',
         },
         {
-            title: project.project_name,
+            title: project.project_name ?? 'Project',
             href: '/project/' + project.id + '/edit',
         },
     ];
