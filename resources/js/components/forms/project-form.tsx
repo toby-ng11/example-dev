@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useTanStackQuery } from '@/hooks/use-query';
 import { type Address, type Architect, type Branches, Companies, type MarketSegment, SharedData, type Specifier, type Status } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AutoCompleteInput } from '../auto-complete';
 import FormCollapsible from '../form-collapsible';
 import FormDatePicker from '../form-datepicker';
@@ -84,12 +84,8 @@ export default function ProjectForm({ id }: ProjectFormProps) {
         },
     });
 
-    // Auto select the first address
-    useEffect(() => {
-        if (!selectedArchitectId || architectAddresses.isFetching) return;
-        const list = architectAddresses.data ?? [];
-        if (list.length > 0 && !form.data.architect_address.id) {
-            const a = list[0];
+    const fillAddressFields = useCallback(
+        (a: Address) => {
             form.setData('architect_address', {
                 id: a.id,
                 name: a.name,
@@ -103,8 +99,19 @@ export default function ProjectForm({ id }: ProjectFormProps) {
                 email_address: a.email_address,
                 url: a.url,
             });
+        },
+        [form],
+    );
+
+    // Auto select the first address
+    useEffect(() => {
+        if (!selectedArchitectId || architectAddresses.isFetching) return;
+        const list = architectAddresses.data ?? [];
+        if (list.length > 0 && !form.data.architect_address.id) {
+            const a = list[0];
+            fillAddressFields(a);
         }
-    }, [architectAddresses.data, architectAddresses.isFetching, form, selectedArchitectId]);
+    }, [architectAddresses.data, architectAddresses.isFetching, form.data.architect_address.id, selectedArchitectId, fillAddressFields]);
 
     return (
         <form id={id}>
@@ -277,19 +284,7 @@ export default function ProjectForm({ id }: ProjectFormProps) {
                                     onValueChange={(val) => {
                                         const select = architectAddresses.data?.find((address) => address.id === val);
                                         if (select) {
-                                            form.setData('architect_address', {
-                                                id: select.id,
-                                                name: select.name,
-                                                phys_address1: select.phys_address1,
-                                                phys_address2: select.phys_address2,
-                                                phys_city: select.phys_city,
-                                                phys_state: select.phys_state,
-                                                phys_postal_code: select.phys_postal_code,
-                                                phys_country: select.phys_country,
-                                                central_phone_number: select.central_phone_number,
-                                                email_address: select.email_address,
-                                                url: select.url,
-                                            });
+                                            fillAddressFields(select);
                                         }
                                     }}
                                 >
