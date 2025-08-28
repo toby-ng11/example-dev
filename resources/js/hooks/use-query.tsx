@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react';
 
 export function useTanStackQuery<TData>(
     url: string,
-    queryKey: (string | number | boolean)[],
+    queryKey: (string | number | boolean | null)[],
     enabled?: boolean,
     params?: Record<string, unknown>,
     options?: Omit<UseQueryOptions<TData[], Error>, 'queryKey' | 'queryFn'>,

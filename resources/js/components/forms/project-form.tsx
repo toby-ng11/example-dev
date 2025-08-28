@@ -4,9 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTanStackQuery } from '@/hooks/use-query';
-import { type Architect, type Branches, Companies, type MarketSegment, SharedData, type Status } from '@/types';
+import { type Address, type Architect, type Branches, Companies, type MarketSegment, SharedData, type Status } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
+import { useState } from 'react';
 import { AutoCompleteInput } from '../auto-complete';
 import FormDatePicker from '../form-datepicker';
 
@@ -28,6 +29,7 @@ interface Project {
     architect_rep_id: string;
     architect_company_id: string;
     architect_class_id: string;
+    architect_address_id: string;
 }
 
 export default function ProjectForm({ id }: ProjectFormProps) {
@@ -36,6 +38,14 @@ export default function ProjectForm({ id }: ProjectFormProps) {
     const companies = useTanStackQuery<Companies>('/lapi/branches?type=companies', ['companies']);
     const statuses = useTanStackQuery<Status>('/lapi/statuses?type=project', ['project-statuses']);
     const marketSegments = useTanStackQuery<MarketSegment>('/lapi/market-segments', ['market-segments']);
+
+    const [selectedArchitectId, setSelectedArchitectId] = useState<string | null>(null);
+
+    const addresses = useTanStackQuery<Address>(
+        selectedArchitectId ? `/architects/${selectedArchitectId}/addresses` : '',
+        ['architect-addresses', selectedArchitectId],
+        !!selectedArchitectId,
+    );
 
     const form = useForm<Project>({
         project_name: '',
@@ -50,6 +60,7 @@ export default function ProjectForm({ id }: ProjectFormProps) {
         architect_company_id: '',
         architect_class_id: '',
         architect_rep_id: '',
+        architect_address_id: '',
     });
 
     return (
@@ -175,6 +186,7 @@ export default function ProjectForm({ id }: ProjectFormProps) {
                                         form.setData('architect_company_id', item.company_id);
                                         form.setData('architect_rep_id', item.architect_rep_id);
                                         form.setData('architect_class_id', item.class_id);
+                                        setSelectedArchitectId(item.id);
                                     }}
                                 />
                             </div>
@@ -227,11 +239,23 @@ export default function ProjectForm({ id }: ProjectFormProps) {
                             </CollapsibleTrigger>
                             <CollapsibleContent>
                                 <div className="grid grid-cols-1 gap-4 pt-4 lg:grid-cols-2 xl:grid-cols-3 xl:gap-6">
-                                    <Input name="architect_address_id" type="hidden" />
-
                                     <div className="grid gap-2">
-                                        <Label htmlFor="address_list">Architect List</Label>
-                                        <Input id="address_list" />
+                                        <Label htmlFor="address_list">Address List</Label>
+                                        <Select
+                                            value={form.data.architect_address_id}
+                                            onValueChange={(val) => form.setData('architect_address_id', val)}
+                                        >
+                                            <SelectTrigger id="address_list">
+                                                <SelectValue placeholder="Please search for an architect first..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {addresses.data?.map((address) => (
+                                                    <SelectItem key={address.id} value={address.id}>
+                                                        {address.name} - {address.phys_address1}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
 
                                     <div className="grid gap-2">
