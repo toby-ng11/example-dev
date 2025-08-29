@@ -4,6 +4,7 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ArchitectAddressController;
 use App\Http\Controllers\ArchitectController;
+use App\Http\Controllers\ArchitectSpecifierController;
 use App\Http\Controllers\MarketSegmentController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\QuoteController;
@@ -37,6 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ]);
 
     Route::resource('architects.addresses', ArchitectAddressController::class);
+    Route::resource('architects.specifiers', ArchitectSpecifierController::class);
     Route::resource('specifiers.address', SpecifierAddressController::class);
 });
 

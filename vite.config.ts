@@ -16,7 +16,11 @@ export default defineConfig(({ command }) => {
                 ssr: 'resources/js/ssr.tsx',
                 refresh: true,
             }),
-            react(),
+            react({
+                babel: {
+                    plugins: ['babel-plugin-react-compiler'],
+                },
+            }),
             tailwindcss(),
         ],
         esbuild: {
