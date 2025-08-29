@@ -47,6 +47,7 @@ export function DataTablePagination<TData>({ table, hasSelect = true }: DataTabl
     const PaginationButtonGroup = () => (
         <div className="flex items-center space-x-2">
             <Button
+                type="button"
                 variant="outline"
                 size="icon"
                 className="hidden size-8 lg:flex"
@@ -56,15 +57,30 @@ export function DataTablePagination<TData>({ table, hasSelect = true }: DataTabl
                 <span className="sr-only">Go to first page</span>
                 <ChevronsLeft />
             </Button>
-            <Button variant="outline" size="icon" className="size-8" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+            <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="size-8"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+            >
                 <span className="sr-only">Go to previous page</span>
                 <ChevronLeft />
             </Button>
-            <Button variant="outline" size="icon" className="size-8" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+            <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="size-8"
+                onClick={() => {table.nextPage(); console.log("CLicked!")}}
+                disabled={!table.getCanNextPage()}
+            >
                 <span className="sr-only">Go to next page</span>
                 <ChevronRight />
             </Button>
             <Button
+                type="button"
                 variant="outline"
                 size="icon"
                 className="hidden size-8 lg:flex"

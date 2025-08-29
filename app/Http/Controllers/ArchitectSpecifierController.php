@@ -13,7 +13,7 @@ class ArchitectSpecifierController extends Controller
      */
     public function index(Architect $architect): JsonResponse
     {
-        $specifiers = $architect->specifiers();
+        $specifiers = $architect->specifiers()->get();
 
         return response()->json($specifiers->toArray());
     }

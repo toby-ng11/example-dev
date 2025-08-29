@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Specifier;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SpecifierAddressController extends Controller
@@ -10,9 +11,10 @@ class SpecifierAddressController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Specifier $specifier): JsonResponse
     {
-        //
+        $address = $specifier->address()->get();
+        return response()->json($address->toArray());
     }
 
     /**

@@ -33,12 +33,13 @@ export default function ProjectFormArchitectAndSpecifier({ form }: ProjectFormAr
 
     const specifierAddress = useTanStackQuery<Address>(
         selectedSpecifierId ? `/specifiers/${selectedSpecifierId}/address` : '',
-        ['architect-specifiers', selectedSpecifierId],
+        ['specifier-address', selectedSpecifierId],
         !!selectedSpecifierId,
     );
 
     const fillAddressFields = useCallback(
         (a: Address) => {
+            form.reset('architect_address');
             form.setData('architect_address', {
                 id: a.id,
                 name: a.name,
@@ -58,6 +59,7 @@ export default function ProjectFormArchitectAndSpecifier({ form }: ProjectFormAr
 
     const fillSpecifierFields = useCallback(
         (s: Specifier) => {
+            form.reset('specifier');
             form.setData('specifier', {
                 id: s.id,
                 first_name: s.first_name,
@@ -70,6 +72,7 @@ export default function ProjectFormArchitectAndSpecifier({ form }: ProjectFormAr
 
     const fillSpecifierAddressFields = useCallback(
         (sa: Address) => {
+            form.reset('specifier_address');
             form.setData('specifier_address', {
                 id: sa.id,
                 central_phone_number: sa.central_phone_number,
@@ -320,18 +323,7 @@ export default function ProjectFormArchitectAndSpecifier({ form }: ProjectFormAr
 
             <FormCollapsible label="Specifier">
                 <div className="grid grid-cols-1 gap-4 pt-4 lg:grid-cols-2 xl:grid-cols-3 xl:gap-6">
-                    <Input
-                        type="hidden"
-                        name="specifier_address_id"
-                        value={form.data.specifier_address.id}
-                        onChange={(e) => {
-                            form.setData('specifier_address.id', e.target.value);
-                            const selectAdress = specifierAddress.data?.find((address) => address.id === e.target.value);
-                            if (selectAdress) {
-                                fillSpecifierAddressFields(selectAdress);
-                            }
-                        }}
-                    />
+                    <Input type="hidden" name="specifier_address_id" value={form.data.specifier_address.id} />
 
                     <div className="grid gap-2">
                         <Label htmlFor="specifier_name">Specifier List</Label>
@@ -342,6 +334,10 @@ export default function ProjectFormArchitectAndSpecifier({ form }: ProjectFormAr
                                 if (select) {
                                     setSelectedSpecifierId(select.id);
                                     fillSpecifierFields(select);
+                                    const selectAdress = specifierAddress.data?.find((address) => address.addressable_id === val);
+                                    if (selectAdress) {
+                                        fillSpecifierAddressFields(selectAdress);
+                                    }
                                 }
                             }}
                         >
