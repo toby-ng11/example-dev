@@ -37,6 +37,10 @@ class Project extends Model
         'architect_address_id',
     ];
 
+    protected $casts = [
+        'id' => 'string',
+    ];
+
     public function status(): BelongsTo
     {
         return $this->belongsTo(Status::class);

@@ -13,7 +13,7 @@ class MarketSegmentController extends Controller
      */
     public function index(): JsonResponse
     {
-        $marketSegments = MarketSegment::orderBy('market_segment_desc')->get();
+        $marketSegments = MarketSegment::query()->select()->orderBy('market_segment_desc')->get();
         return response()->json($marketSegments->toArray());
     }
 

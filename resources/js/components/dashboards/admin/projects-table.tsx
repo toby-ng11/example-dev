@@ -237,8 +237,8 @@ export default function ProjectsTable() {
                                 ]}
                             />
 
-                            <DataTableMain table={table} columns={columns} />
-                            <DataTablePagination table={table} />
+                            <DataTableMain isFetching={isFetching} table={table} columns={columns} />
+                            <DataTablePagination isFetching={isFetching} table={table} />
                         </>
                     ) : (
                         <DataTableSkeleton rows={15} cols={5} />

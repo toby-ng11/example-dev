@@ -1,14 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table } from '@tanstack/react-table';
+import { PaginationState, Table } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
 interface DataTablePaginationProps<TData> {
     table: Table<TData>;
     hasSelect?: boolean;
+    tablePaginationState: PaginationState;
 }
 
-export function DataTablePagination<TData>({ table, hasSelect = true }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData>({ table, hasSelect = true, tablePaginationState }: DataTablePaginationProps<TData>) {
     const PaginationRowSelectedNumber = () => (
         <div className="text-muted-foreground flex-1 text-sm">
             {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
@@ -19,13 +20,13 @@ export function DataTablePagination<TData>({ table, hasSelect = true }: DataTabl
         <div className="flex items-center space-x-2">
             <p className="text-sm font-medium">Rows per page</p>
             <Select
-                value={`${table.getState().pagination.pageSize}`}
+                value={`${tablePaginationState.pageSize}`}
                 onValueChange={(value) => {
                     table.setPageSize(Number(value));
                 }}
             >
                 <SelectTrigger className="h-8 w-[70px]">
-                    <SelectValue placeholder={table.getState().pagination.pageSize} />
+                    <SelectValue placeholder={tablePaginationState.pageSize} />
                 </SelectTrigger>
                 <SelectContent side="top">
                     {[10, 15, 20, 25, 30, 40, 50].map((pageSize) => (
@@ -40,7 +41,7 @@ export function DataTablePagination<TData>({ table, hasSelect = true }: DataTabl
 
     const PaginationPageIndex = () => (
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+            Page {tablePaginationState.pageIndex + 1} of {table.getPageCount()}
         </div>
     );
 
@@ -73,7 +74,7 @@ export function DataTablePagination<TData>({ table, hasSelect = true }: DataTabl
                 variant="outline"
                 size="icon"
                 className="size-8"
-                onClick={() => {table.nextPage(); console.log("CLicked!")}}
+                onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
             >
                 <span className="sr-only">Go to next page</span>

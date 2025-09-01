@@ -203,15 +203,13 @@ export default function QuotedItemTable() {
                                 searchAfterFilter={true}
                             />
 
-                            <DataTableMain table={table} columns={columns} />
-                            <DataTablePagination table={table} hasSelect={false} />
+                            <DataTableMain table={table} columns={columns} isFetching />
+                            <DataTablePagination table={table} hasSelect={false} isFetching />
                         </>
                     ) : (
                         <DataTableSkeleton rows={15} cols={5} />
                     )}
                 </div>
-
-
             </div>
         </div>
     );

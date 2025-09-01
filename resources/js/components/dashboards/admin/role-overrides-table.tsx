@@ -102,7 +102,7 @@ export default function RoleOverrideTable() {
                     </p>
                 </div>
                 <div className="flex flex-col gap-4">
-                    {!isLoading && !isFetching ? <DataTableMain table={table} columns={columns} /> : <DataTableSkeleton rows={5} cols={5} />}
+                    {!isLoading && !isFetching ? <DataTableMain isFetching={isFetching} table={table} columns={columns} /> : <DataTableSkeleton rows={5} cols={5} />}
                 </div>
             </div>
         </div>

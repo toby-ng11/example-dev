@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
-
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,18 +16,27 @@ class ProjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
+        //$page = $request->get('page', 1);
+        $size = $request->get('size', 10);
+        $filter = $request->get('filter', null);
 
+        if ($filter) {
+            $projects = Project::whereRaw('LOWER(project_name) LIKE ?', ['%' . $filter . '%'])->paginate($size);
+        } else {
+            $projects = Project::paginate($size);
+        }
+
+        return response()->json([
+            'projects' => $projects,
+        ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
