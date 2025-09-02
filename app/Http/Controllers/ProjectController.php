@@ -20,7 +20,7 @@ class ProjectController extends Controller
     {
         //$page = $request->get('page', 1);
         $size = $request->get('size', 10);
-        $filter = $request->get('filter', null);
+        $filter = $request->get('search', null);
 
         if ($filter) {
             $projects = Project::whereRaw('LOWER(project_name) LIKE ?', ['%' . $filter . '%'])->paginate($size);

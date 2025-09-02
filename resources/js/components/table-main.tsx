@@ -1,19 +1,19 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ColumnDef, flexRender, Table as TanStackTable } from '@tanstack/react-table';
+import { DataTableSkeleton } from './table-skeleton';
 
 interface DataTableMainProps<TData> {
     table: TanStackTable<TData>;
     columns: ColumnDef<TData>[];
     isFetching: boolean;
+    pageSize?: number;
 }
 
-export default function DataTableMain<TData>({ table, columns, isFetching }: DataTableMainProps<TData>) {
+export default function DataTableMain<TData>({ table, columns, isFetching, pageSize = 10 }: DataTableMainProps<TData>) {
     return (
         <div className="overflow-hidden rounded-md border">
             {isFetching ? (
-                <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-white/20 backdrop-blur-sm transition">
-                    <span className="h-6 w-6 animate-spin rounded-full border-2 border-gray-500 border-t-transparent" />
-                </div>
+                <DataTableSkeleton rows={pageSize} />
             ) : (
                 <Table>
                     <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">

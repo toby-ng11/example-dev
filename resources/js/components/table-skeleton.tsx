@@ -12,11 +12,11 @@ export function DataTableSkeleton({ rows = 5, cols = 5 }: DataTableSkeletonProps
 
     return (
         <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
                 <TableRow>
                     {columnNumber.map((_, i) => (
                         <TableHead key={i}>
-                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-9 w-20" />
                         </TableHead>
                     ))}
                 </TableRow>
@@ -26,7 +26,7 @@ export function DataTableSkeleton({ rows = 5, cols = 5 }: DataTableSkeletonProps
                     <TableRow key={i}>
                         {columnNumber.map((_, j) => (
                             <TableCell key={j}>
-                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-5 w-full" />
                             </TableCell>
                         ))}
                     </TableRow>
