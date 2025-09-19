@@ -7,17 +7,7 @@ import { Input } from '@/components/ui/input';
 import { useTanStackQuery } from '@/hooks/use-query';
 import { type MarketSegment } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
-import {
-    ColumnDef,
-    getCoreRowModel,
-    getFacetedRowModel,
-    getFacetedUniqueValues,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    SortingState,
-    useReactTable,
-} from '@tanstack/react-table';
+import { ColumnDef, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from '@tanstack/react-table';
 import axios from 'axios';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -73,7 +63,6 @@ export default function MarketSegmentTable() {
             accessorKey: 'market_segment_desc',
             header: ({ column }) => <DataTableColumnHeader column={column} title="Market Segment" />,
             enableHiding: false,
-            meta: 'Market Segment',
             cell: ({ row }) => {
                 const rowId = row.original.id;
                 const value = row.getValue('market_segment_desc') as string;
@@ -141,16 +130,15 @@ export default function MarketSegmentTable() {
         data: marketSegments,
         columns,
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        getFacetedRowModel: getFacetedRowModel(),
-        getFacetedUniqueValues: getFacetedUniqueValues(),
         onSortingChange: setSorting,
         state: {
             sorting,
         },
+        manualSorting: false,
     });
+
+    console.log('MarketSegment', table);
 
     return (
         <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
@@ -162,7 +150,11 @@ export default function MarketSegmentTable() {
                     <p className="text-muted-foreground">Project and opportunity segments can be added or editted here.</p>
                 </div>
                 <div className="flex flex-col gap-4">
-                    {!isLoading && !isFetching ? <DataTableMain isFetching={isFetching} table={table} columns={columns} /> : <DataTableSkeleton rows={5} cols={5} />}
+                    {!isLoading && !isFetching ? (
+                        <DataTableMain isFetching={isFetching} table={table} columns={columns} />
+                    ) : (
+                        <DataTableSkeleton rows={5} cols={5} />
+                    )}
                 </div>
             </div>
         </div>

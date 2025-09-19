@@ -265,7 +265,7 @@ export default function TestProjectTable() {
                             isFetching={users.isFetching}
                         />
 
-                        <DataTablePagination table={table} tablePaginationState={pagination} />
+                        <DataTablePagination table={table} />
                     </div>
                 )}
             </div>

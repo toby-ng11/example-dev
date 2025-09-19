@@ -1,16 +1,17 @@
 import { DataTableColumnHeader } from '@/components/table-header';
-import DataTableMain from '@/components/table-main';
 import { DataTablePagination } from '@/components/table-pagination';
 import { DataTableRefreshButton } from '@/components/table-refresh-button';
 import { DataTableSkeleton } from '@/components/table-skeleton';
 import { DataTableToolbar } from '@/components/table-toolbar';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useTanStackQuery } from '@/hooks/use-query';
 import { Link } from '@inertiajs/react';
 import {
     ColumnDef,
     ColumnFiltersState,
     FilterFn,
+    flexRender,
     getCoreRowModel,
     getFacetedRowModel,
     getFacetedUniqueValues,
@@ -225,8 +226,6 @@ export default function ProjectsTable() {
                                 table={table}
                                 searchColumn="project_name"
                                 searchPlaceholder="Filter project names..."
-                                showAddButton
-                                onAddClick={() => console.log('Add clicked')}
                                 facetedFilters={[
                                     { columnId: 'owner_id', title: 'Owner' },
                                     { columnId: 'shared_users', title: 'Shared' },
@@ -237,15 +236,51 @@ export default function ProjectsTable() {
                                 ]}
                             />
 
-                            <DataTableMain isFetching={isFetching} table={table} columns={columns} />
-                            <DataTablePagination isFetching={isFetching} table={table} />
+                            <div className="overflow-hidden rounded-md border">
+                                <Table>
+                                    <TableHeader className="bg-muted sticky top-0 z-10 [&_tr]:border-b">
+                                        {table.getHeaderGroups().map((headerGroup) => (
+                                            <TableRow key={headerGroup.id}>
+                                                {headerGroup.headers.map((header) => {
+                                                    return (
+                                                        <TableHead key={header.id} colSpan={header.colSpan}>
+                                                            {header.isPlaceholder
+                                                                ? null
+                                                                : flexRender(header.column.columnDef.header, header.getContext())}
+                                                        </TableHead>
+                                                    );
+                                                })}
+                                            </TableRow>
+                                        ))}
+                                    </TableHeader>
+                                    <TableBody>
+                                        {table.getRowModel().rows?.length ? (
+                                            table.getRowModel().rows.map((row) => (
+                                                <TableRow key={row.id}>
+                                                    {row.getVisibleCells().map((cell) => (
+                                                        <TableCell key={cell.id} className="p-2 text-left whitespace-nowrap">
+                                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                        </TableCell>
+                                                    ))}
+                                                </TableRow>
+                                            ))
+                                        ) : (
+                                            <TableRow>
+                                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                                    No data found.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
+
+                            <DataTablePagination table={table} />
                         </>
                     ) : (
                         <DataTableSkeleton rows={15} cols={5} />
                     )}
                 </div>
-
-
             </div>
         </div>
     );

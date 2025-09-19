@@ -17,6 +17,7 @@ import {
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
+    PaginationState,
     SortingState,
     useReactTable,
     VisibilityState,
@@ -51,6 +52,11 @@ export default function QuotesTable() {
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
     const [isReady, setIsReady] = useState(false);
     const lastSavedVisibility = useRef<VisibilityState>({});
+    const [pagination, setPagination] = useState<PaginationState>({
+        pageIndex: 0,
+        pageSize: 15,
+    });
+
     const { data: quotes = [], isLoading, isFetching, refetch, dataUpdatedAt } = useTanStackQuery<Quote>(ENDPOINT, qKey);
 
     // Restore saved visibility
@@ -167,9 +173,11 @@ export default function QuotesTable() {
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
         onSortingChange: setSorting,
+        onPaginationChange: setPagination,
         onColumnFiltersChange: setColumnFilters,
         onColumnVisibilityChange: setColumnVisibility,
         state: {
+            pagination,
             sorting,
             columnFilters,
             columnVisibility,
@@ -200,8 +208,6 @@ export default function QuotesTable() {
                                 table={table}
                                 searchColumn="project_name"
                                 searchPlaceholder="Filter jobs name..."
-                                showAddButton
-                                onAddClick={() => console.log('Add clicked')}
                                 facetedFilters={[
                                     { columnId: 'created_by', title: 'Taker' },
                                     { columnId: 'customer_name', title: 'Customer' },
@@ -210,15 +216,19 @@ export default function QuotesTable() {
                                 ]}
                             />
 
-                            <DataTableMain isFetching={isFetching} table={table} columns={columns} />
-                            <DataTablePagination isFetching={isFetching} table={table} />
+                            <DataTableMain
+                                isFetching={isFetching}
+                                table={table}
+                                columns={columns}
+                                key={`table-${pagination.pageIndex}`}
+                                pageSize={pagination.pageSize}
+                            />
+                            <DataTablePagination table={table} />
                         </>
                     ) : (
                         <DataTableSkeleton rows={15} cols={5} />
                     )}
                 </div>
-
-
             </div>
         </div>
     );
