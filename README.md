@@ -1,30 +1,28 @@
-**Project to Quote (P2Q) - Laminas Project Documentation**
+**Project to Quote (P2Q) - Laravel Test Project Documentation**
 
 ---
 
 # Project Overview
 
-**Project Name:** Project to Quote (P2Q)
+**Project Name:** Project to Quote (P2Q) - Laravel Test Project
 
 **Description:**
-P2Q is an internal tool designed for architect representatives to manage opportunity records. Opportunities can be converted to projects once awarded to a contractor. Additionally, the system allows conversion to quotes and enables reps to submit quotes for manager approval.
+This Laravel-based test project is being developed to experiment with React components and Inertia.js integrations. The goal is to test and refine components before integrating them back into the main Laminas project for Centura.
 
 # Technology Stack
 
-* Laminas MVC
-* Laminas\Db
+* Laravel Framework
 * Inertia.js
 * React
-* SQL Server
-* Hosted on IIS (Windows Server)
+* SQL Server (for testing purposes)
+* Hosted on IIS (Windows Server, internal)
 
 # Features
 
-* Manage opportunities and projects
-* Convert opportunities to projects
-* Convert projects to quotes
-* Quote submission and manager approval workflow
-* Partial migration of controllers to Inertia.js/React for modernized frontend
+* React component testing
+* Inertia.js integration for frontend
+* Mimics Laminas MVC workflows for opportunities, projects, and quotes
+* Backend and database structure compatible with the Laminas project for easy migration
 
 # Setup Instructions
 
@@ -41,30 +39,41 @@ P2Q is an internal tool designed for architect representatives to manage opportu
    composer install
    ```
 
-3. Install Node.js dependencies (for Inertia.js/React parts):
+3. Install Node.js dependencies:
 
    ```bash
    npm install
    ```
 
-4. Configure the project:
+4. Configure the environment:
 
-   * Edit `config/autoload/global.php` or `config/autoload/local.php` to set up database connection and other environment variables.
-   * Note: Database access is restricted as this project is for internal use by Centura.
+   * Copy `.env.example` to `.env`
+   * Set up database credentials and other environment variables
+   * Note: Database is for testing only and cannot access the production Centura database
 
-5. Host the application on the company IIS server.
+5. Run migrations and seeders (optional for testing):
+
+   ```bash
+   php artisan migrate --seed
+   ```
+
+6. Start the development server:
+
+   ```bash
+   php artisan serve
+   ```
 
 # Project Status
 
-* Core Laminas MVC functionality fully implemented
-* Gradual migration of controllers to Inertia.js/React
-* Database models and Laminas\Db fully functional
+* Development in progress
+* Focused on React/Inertia component testing
+* Backend setup compatible with the Laminas project
 
 # Contribution Guidelines
 
-* This is a company internal project. Contributions are restricted to Centura developers.
-* Follow Laminas MVC best practices when adding new controllers or modules.
-* Use Inertia.js/React for frontend components wherever possible.
+* Internal Centura project only
+* Test React components thoroughly before migration
+* Maintain consistency with Laminas project workflows
 
 # License
 
@@ -72,5 +81,5 @@ P2Q is an internal tool designed for architect representatives to manage opportu
 
 # Notes
 
-* Ensure that any frontend migration does not disrupt the existing Laminas MVC routes.
-* The project is hosted on a Windows IIS server, so deployment scripts should be compatible with this environment.
+* This project is for testing purposes and is not yet production-ready.
+* Components validated here will be integrated back into the main Laminas project for Centura.
